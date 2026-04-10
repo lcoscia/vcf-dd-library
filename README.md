@@ -63,8 +63,7 @@ A **Private Library** section gives authenticated users access to Low-Level Desi
 ## Usage
 
 ### Access the Private Library
-Click **🔒 Private Library** in the header. If not authenticated, a login modal appears.  
-Default admin credentials: `admin` / `Admin@VCF2024` *(change after first login via Admin Panel)*
+Click **🔒 Private Library** in the header. If not authenticated, a login modal appears. Contact the administrator to obtain your credentials.
 
 ### Request Access
 Click **Request Access** in the login modal to open the access request form. The admin receives an email automatically.
