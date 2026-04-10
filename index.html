@@ -26,6 +26,16 @@
   #header h1 { font-size: 16px; font-weight: 600; letter-spacing: 0.3px; }
   #header .spacer { flex: 1; }
   #header .badge { background: rgba(255,255,255,0.12); padding: 3px 10px; border-radius: 20px; font-size: 11px; color: #aab; }
+  #version-select {
+    background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 5px; padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer;
+    outline: none; appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 8px center;
+    padding-right: 24px; transition: background 0.15s;
+  }
+  #version-select:hover { background-color: rgba(255,255,255,0.22); }
+  #version-select option { background: #1a1a2e; color: white; }
   .btn {
     padding: 7px 14px; border-radius: 5px; border: none; cursor: pointer;
     font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;
@@ -373,6 +383,10 @@
     </svg>
     <h1>VCF Design Decision Library</h1>
   </div>
+  <select id="version-select" onchange="switchVersion(this.value)" title="Select VCF version">
+    <option value="9.0">VCF 9.0</option>
+    <option value="9.1">VCF 9.1</option>
+  </select>
   <span id="header-badge" class="badge">VMware Cloud Foundation 9.0</span>
   <div class="spacer"></div>
   <button class="btn btn-secondary" onclick="openImportModal()">
@@ -736,7 +750,7 @@
       <div style="display:flex;gap:20px;font-size:11px;opacity:0.8;margin-top:8px;">
         <span>👤 Author: <strong>L.COSCIA</strong></span>
         <span>🏢 <strong>ITQ</strong></span>
-        <span>📅 Version: 1.2</span>
+        <span>📅 Version: 1.3</span>
         <span id="about-dd-count">📊 Design Decisions</span>
       </div>
     </div>
@@ -797,12 +811,27 @@
             <div style="font-weight:700;margin-bottom:3px;">⭐ Marked Filter</div>
             <div style="color:#666;">Filter the table to show only marked or unmarked Design Decisions via the sidebar.</div>
           </div>
+          <div style="background:#f5f7fa;border-radius:6px;padding:10px 12px;font-size:12px;">
+            <div style="font-weight:700;margin-bottom:3px;">🔀 Multi-version Support</div>
+            <div style="color:#666;">Switch between <strong>VCF 9.0</strong> and <strong>VCF 9.1</strong> via the header dropdown. Import a new Excel to populate VCF 9.1 data.</div>
+          </div>
         </div>
       </div>
 
       <div>
         <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#0074d9;margin-bottom:10px;">📋 Changelog</h3>
         <div style="font-size:12px;border-left:3px solid #0074d9;padding-left:14px;display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <div style="font-weight:700;color:#1a1a2e;">v1.3 — Multi-version Support</div>
+            <div style="color:#666;margin-top:3px;">
+              <ul style="margin:4px 0 0 14px;padding:0;display:flex;flex-direction:column;gap:3px;">
+                <li>Added <strong>version selector</strong> in the header to switch between VCF 9.0 and VCF 9.1.</li>
+                <li>VCF 9.0 data is embedded. VCF 9.1 slot is ready — import an Excel file to populate it.</li>
+                <li>Switching version resets all filters, selections and marks automatically.</li>
+                <li>Imported Excel files are stored in the active version's slot for the session.</li>
+              </ul>
+            </div>
+          </div>
           <div>
             <div style="font-weight:700;color:#1a1a2e;">v1.2 — Click-to-Edit &amp; Marked Filter</div>
             <div style="color:#666;margin-top:3px;">
@@ -899,6 +928,54 @@ const COMPONENT_NAMES = {
 };
 
 // ============================================================
+// VERSION MANAGEMENT
+// ============================================================
+const VCF_VERSIONS = {
+  '9.0': EMBEDDED_DATA,
+  '9.1': []
+};
+let currentVersion = '9.0';
+
+function switchVersion(ver) {
+  currentVersion = ver;
+  allData = VCF_VERSIONS[ver] || [];
+
+  // Reset state
+  selectedUids.clear();
+  markedUids.clear();
+  expandedCells.clear();
+
+  // Update badge
+  document.getElementById('header-badge').textContent = `VMware Cloud Foundation ${ver}`;
+
+  // Reset filters UI
+  document.getElementById('search-box').value = '';
+  document.getElementById('filter-component').value = '';
+  document.getElementById('filter-type').value = '';
+  document.getElementById('filter-source').value = '';
+  document.getElementById('filter-subsection').value = '';
+  document.getElementById('filter-status').value = '';
+  document.getElementById('filter-criticality').value = '';
+  document.getElementById('filter-marked').value = '';
+
+  // Repopulate filters
+  document.getElementById('filter-component').innerHTML = '<option value="">All Components</option>';
+  document.getElementById('filter-subsection').innerHTML = '<option value="">All Categories</option>';
+  document.getElementById('filter-status').innerHTML = '<option value="">All Statuses</option>';
+  document.getElementById('filter-criticality').innerHTML = '<option value="">All Criticalities</option>';
+
+  if (allData.length > 0) {
+    populateFilters();
+  }
+  applyFilters();
+
+  showToast(allData.length > 0
+    ? `VCF ${ver} — ${allData.length} Design Decisions loaded`
+    : `VCF ${ver} — No data yet. Import an Excel file to get started.`
+  );
+}
+
+// ============================================================
 // INIT
 // ============================================================
 function init() {
@@ -906,6 +983,7 @@ function init() {
 
   // Assign UIDs if missing
   allData.forEach((d, i) => { if (d._uid === undefined) d._uid = i; });
+  VCF_VERSIONS['9.0'] = allData;
 
   populateFilters();
   applyFilters();
@@ -1559,8 +1637,11 @@ function processImportFile(file) {
 
       if (decisions.length === 0) throw new Error('No design decisions found in this file.');
 
+      // Store in current version slot
+      VCF_VERSIONS[currentVersion] = decisions;
       allData = decisions;
       selectedUids.clear();
+      markedUids.clear();
       expandedCells.clear();
       // Repopulate filter dropdowns
       document.getElementById('filter-component').innerHTML = '<option value="">All Components</option>';
@@ -1570,7 +1651,7 @@ function processImportFile(file) {
       populateFilters();
       applyFilters();
       document.getElementById('import-modal-overlay').classList.remove('open');
-      showToast(`Imported ${decisions.length} decisions from ${file.name}`);
+      showToast(`VCF ${currentVersion} — Imported ${decisions.length} decisions from ${file.name}`);
     } catch(err) {
       document.getElementById('import-status').textContent = `Error: ${err.message}`;
     }

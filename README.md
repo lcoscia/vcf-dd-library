@@ -3,8 +3,8 @@
 An interactive single-page web application to browse, filter, edit, and export VMware Cloud Foundation 9.0 Design Decisions.
 
 > **Author:** L.COSCIA  
-> **Version:** 1.2  
-> **Data:** Design Decisions across 21+ components
+> **Version:** 1.3  
+> **Data:** Design Decisions across 21+ components (VCF 9.0 embedded · VCF 9.1 via Excel import)
 
 ---
 
@@ -18,6 +18,7 @@ This tool provides a fast, offline-capable interface for the VCF Design Library 
 
 | Feature | Description |
 |---|---|
+| 🔀 **Multi-version Support** | Switch between VCF 9.0 and VCF 9.1 via the header dropdown. VCF 9.0 is embedded; VCF 9.1 is populated by importing an Excel file |
 | 🔍 **Search & Filter** | Full-text search across all fields. Filter by Component, Type, Category, Status, Criticality and Marked status |
 | ⊞ **Group by Category** | Toggle category grouping with collapsible sections |
 | ↔ **Resizable Columns** | Drag column borders to adjust width |
@@ -51,6 +52,9 @@ Click **Import Excel** in the header and select a `.xlsx` file with the same str
 ### Edit a Design Decision
 - Click directly on the **ID** of any row to instantly open the edit modal
 - Or select a single row (click or checkbox) and click **✏️ Edit** in the toolbar
+
+### Switch VCF version
+Use the **version dropdown** in the header (next to the logo) to switch between VCF 9.0 and VCF 9.1. VCF 9.0 data is embedded. To use VCF 9.1, select it then click **Import Excel** to load the corresponding `.xlsx` file.
 
 ### Filter marked decisions
 Use the **Marked Status** dropdown in the sidebar to show only ⭐ marked or ☆ unmarked decisions.
@@ -86,6 +90,12 @@ Original format: `.xlsx` with columns: Design Decision ID, Design Decision, Desi
 ---
 
 ## Changelog
+
+### v1.3 — Multi-version Support
+- Added version selector dropdown in the header (VCF 9.0 / VCF 9.1)
+- VCF 9.0 data embedded; VCF 9.1 slot ready for Excel import
+- Switching version resets all filters, selections and marks
+- Imported Excel data is stored in the active version slot for the session
 
 ### v1.2 — Click-to-Edit & Marked Filter
 - Clicking on a Design Decision ID now instantly opens its edit modal
