@@ -870,7 +870,7 @@
       <div style="display:flex;gap:20px;font-size:11px;opacity:0.8;margin-top:8px;">
         <span>👤 Author: <strong>L.COSCIA</strong></span>
         <span>🏢 <strong>ITQ</strong></span>
-        <span>📅 Version: 1.4</span>
+        <span>📅 Version: 1.5</span>
         <span id="about-dd-count">📊 Design Decisions</span>
       </div>
     </div>
@@ -957,6 +957,17 @@
       <div>
         <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#0074d9;margin-bottom:10px;">📋 Changelog</h3>
         <div style="font-size:12px;border-left:3px solid #0074d9;padding-left:14px;display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <div style="font-weight:700;color:#1a1a2e;">v1.5 — Supabase Auth</div>
+            <div style="color:#666;margin-top:3px;">
+              <ul style="margin:4px 0 0 14px;padding:0;display:flex;flex-direction:column;gap:3px;">
+                <li>Authentication migrated to <strong>Supabase Auth</strong> (bcrypt server-side, JWT sessions).</li>
+                <li>Sessions persistantes cross-browser et en navigation privée.</li>
+                <li>User management via <strong>Edge Function</strong> — clé service role jamais exposée côté client.</li>
+                <li>Base de données <strong>PostgreSQL</strong> avec Row Level Security.</li>
+              </ul>
+            </div>
+          </div>
           <div>
             <div style="font-weight:700;color:#1a1a2e;">v1.4 — Private Library &amp; Admin Panel</div>
             <div style="color:#666;margin-top:3px;">

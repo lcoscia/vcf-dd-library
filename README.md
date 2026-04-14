@@ -3,7 +3,7 @@
 An interactive single-page web application to browse, filter, edit, and export VMware Cloud Foundation Design Decisions — with a secured Private Library for Low-Level Blueprint Design Decisions.
 
 > **Author:** L.COSCIA  
-> **Version:** 1.4  
+> **Version:** 1.5  
 > **Data:** 1,500+ public DDs (VCF 9.0 embedded · VCF 9.1 via import) + 1,547 private Low-Level DDs across 5 blueprints
 
 ---
@@ -39,7 +39,7 @@ A **Private Library** section gives authenticated users access to Low-Level Desi
 ### Private Section (Authentication Required)
 | Feature | Description |
 |---|---|
-| 🔒 **Secure Login** | SHA-256 hashed passwords, session managed via `sessionStorage` |
+| 🔒 **Secure Login** | Supabase Auth (bcrypt server-side), sessions JWT persistantes cross-browser |
 | 📋 **Blueprint Selector** | Switch between all 5 VCF Fleet blueprints |
 | 📊 **Low-Level DDs** | 1,547 Low-Level Design Decisions across 5 blueprints |
 | 🏗️ **HLR Panel** | High Level Deployment Requirements per blueprint (from Broadcom TechDocs) |
@@ -99,10 +99,10 @@ VCF_LowLevelDesignDecisions/     ← Source xlsx files (5 blueprints)
 
 ## Technical Details
 
-- **Pure HTML/CSS/JS** — no framework, no build step, no backend
-- **Authentication**: passwords hashed with SHA-256 via native `SubtleCrypto` API
-- **Session**: stored in `sessionStorage` (expires on tab close)
-- **Users**: stored as hashed entries in `localStorage` (never plaintext)
+- **Pure HTML/CSS/JS** — no framework, no build step
+- **Authentication**: [Supabase Auth](https://supabase.com) — bcrypt server-side, JWT sessions (ES256), cross-browser persistent
+- **User management**: Supabase Edge Function (`manage-user`) — create, reset password, delete via service role key (never exposed client-side)
+- **Database**: Supabase PostgreSQL — `profiles` table with Row Level Security
 - **Email**: [EmailJS](https://emailjs.com) for access request notifications (no backend required)
 - **SheetJS (xlsx.js)** loaded from CDN for Excel import/export
 - ~1.5 MB total file size (includes all embedded blueprint data)
@@ -118,6 +118,13 @@ VCF_LowLevelDesignDecisions/     ← Source xlsx files (5 blueprints)
 ---
 
 ## Changelog
+
+### v1.5 — Supabase Auth
+- Migrated authentication from localStorage/SHA-256 to **Supabase Auth** (bcrypt server-side)
+- Sessions JWT persistantes : fonctionne en navigation privée et sur tous les navigateurs
+- User management via **Supabase Edge Function** — la clé service role n'est jamais exposée côté client
+- Base de données **Supabase PostgreSQL** avec Row Level Security sur la table `profiles`
+- Réutilisable pour tous les futurs outils du projet
 
 ### v1.4 — Private Library & Admin Panel
 - Added **Private Library** section with SHA-256 authentication and session management
