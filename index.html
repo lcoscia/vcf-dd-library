@@ -2281,10 +2281,10 @@ async function doLogin() {
   const errEl = document.getElementById('login-error');
   errEl.textContent = '';
   if (!username || !password) { errEl.textContent = 'Please fill in all fields.'; return; }
-  const { data: email, error: rpcErr } = await sb.rpc('get_email_by_username', { p_username: username });
-  if (rpcErr || !email) { errEl.textContent = 'Unknown username.'; return; }
+  const { data: email } = await sb.rpc('get_email_by_username', { p_username: username });
+  if (!email) { errEl.textContent = 'Invalid username or password.'; return; }
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) { errEl.textContent = 'Invalid credentials.'; return; }
+  if (error) { errEl.textContent = 'Invalid username or password.'; return; }
   await loadCurrentUser(data.user.id);
   if (!currentUser?.active) {
     await sb.auth.signOut();
@@ -2507,7 +2507,7 @@ async function renderUserTable() {
     <tr>
       <td><strong>${escHtml(u.username)}</strong></td>
       <td>${escHtml(u.email||'—')}</td>
-      <td><span class="role-${u.role}">${u.role}</span></td>
+      <td><span class="role-${escAttr(u.role)}">${escHtml(u.role)}</span></td>
       <td><span class="status-${u.active?'active':'inactive'}">${u.active?'Active':'Inactive'}</span></td>
       <td style="color:#888;font-size:11px;">${escHtml(u.created||'—')}</td>
       <td style="display:flex;gap:4px;flex-wrap:wrap;">
