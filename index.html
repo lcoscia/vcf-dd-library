@@ -6,6 +6,7 @@
 <title>VCF Design Decision Library</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -2236,40 +2237,28 @@ function toggleSidebar() {
 // ============================================================
 
 // ============================================================
-// AUTH — SHA-256 + Session
+// AUTH — Supabase
 // ============================================================
-const DEFAULT_ADMIN = {
-  username: 'admin',
-  email: 'leo.assit.ia@gmail.com',
-  passwordHash: '9bdbc94b396fc5bea301e5f2abac22585382209e97c96d03294b50960ff06ff6',
-  role: 'admin',
-  active: true,
-  created: '2025-01-01'
-};
-
-async function sha256(str) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-}
-
-function getUsers() {
-  const extra = JSON.parse(localStorage.getItem('vcfdd_users') || '[]');
-  const adminEntry = Object.assign({}, DEFAULT_ADMIN);
-  const override = JSON.parse(localStorage.getItem('vcfdd_admin_override') || '{}');
-  if (override.passwordHash) adminEntry.passwordHash = override.passwordHash;
-  return [adminEntry, ...extra];
-}
+const SUPABASE_URL  = 'https://zpuwusopejoyrbpgamuw.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwdXd1c29wZWpveXJicGdhbXV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzEyNTEsImV4cCI6MjA5MTc0NzI1MX0.DgZfOfBs4NoT8pEF8D8yn2BnhdIMrZ1gX09zapfxEto';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 let currentUser = null;
 
-function checkSession() {
-  try {
-    const s = JSON.parse(sessionStorage.getItem('vcfdd_session') || 'null');
-    if (!s) return false;
-    const user = getUsers().find(u => u.username === s.username && u.active);
-    if (user) { currentUser = user; return true; }
-  } catch(e) {}
-  return false;
+async function loadCurrentUser(userId) {
+  const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+  if (data) currentUser = { ...data };
+}
+
+async function initAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    await loadCurrentUser(session.user.id);
+    if (currentUser?.active) enterPrivateMode();
+  }
+  supabase.auth.onAuthStateChange(async (event) => {
+    if (event === 'SIGNED_OUT') { currentUser = null; exitPrivateMode(); }
+  });
 }
 
 async function doLogin() {
@@ -2278,20 +2267,32 @@ async function doLogin() {
   const errEl = document.getElementById('login-error');
   errEl.textContent = '';
   if (!username || !password) { errEl.textContent = 'Please fill in all fields.'; return; }
-  const hash = await sha256(password);
-  const user = getUsers().find(u => u.username === username && u.passwordHash === hash && u.active);
-  if (!user) { errEl.textContent = 'Invalid credentials or account inactive.'; return; }
-  currentUser = user;
-  sessionStorage.setItem('vcfdd_session', JSON.stringify({ username: user.username, role: user.role }));
+  const { data: email, error: rpcErr } = await supabase.rpc('get_email_by_username', { p_username: username });
+  if (rpcErr || !email) { errEl.textContent = 'Unknown username.'; return; }
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) { errEl.textContent = 'Invalid credentials.'; return; }
+  await loadCurrentUser(data.user.id);
+  if (!currentUser?.active) {
+    await supabase.auth.signOut();
+    errEl.textContent = 'Account inactive. Contact the administrator.';
+    return;
+  }
   closeLoginModal();
   enterPrivateMode();
 }
 
-function doLogout() {
+async function doLogout() {
+  await supabase.auth.signOut();
   currentUser = null;
-  sessionStorage.removeItem('vcfdd_session');
   exitPrivateMode();
   showToast('Logged out from Private Library');
+}
+
+async function checkSession() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return false;
+  await loadCurrentUser(session.user.id);
+  return !!(currentUser?.active);
 }
 
 // ============================================================
@@ -2312,9 +2313,9 @@ function openLoginModal() {
 }
 function closeLoginModal() { document.getElementById('login-overlay').classList.remove('open'); }
 
-function togglePrivateSection() {
+async function togglePrivateSection() {
   if (privateMode) { exitPrivateMode(); return; }
-  if (checkSession()) { enterPrivateMode(); } else { openLoginModal(); }
+  if (await checkSession()) { enterPrivateMode(); } else { openLoginModal(); }
 }
 
 function enterPrivateMode() {
@@ -2474,28 +2475,33 @@ function sendAccessRequest() {
 // ============================================================
 // ADMIN PANEL
 // ============================================================
-function openAdminPanel() {
+async function openAdminPanel() {
   if (!currentUser || currentUser.role !== 'admin') { showToast('Admin access required'); return; }
-  renderUserTable();
   document.getElementById('admin-overlay').classList.add('open');
+  await renderUserTable();
 }
 function closeAdminPanel() { document.getElementById('admin-overlay').classList.remove('open'); }
 
-function renderUserTable() {
-  const users = getUsers();
+async function renderUserTable() {
+  document.getElementById('admin-user-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888;padding:16px;">Loading…</td></tr>';
+  const { data: users, error } = await supabase.from('profiles').select('*').order('created', { ascending: true });
+  if (error || !users) {
+    document.getElementById('admin-user-tbody').innerHTML = '<tr><td colspan="6" style="color:red;padding:16px;">Error loading users</td></tr>';
+    return;
+  }
   document.getElementById('admin-user-tbody').innerHTML = users.map(u => `
     <tr>
       <td><strong>${escHtml(u.username)}</strong></td>
-      <td>${escHtml(u.email)}</td>
+      <td>${escHtml(u.email||'—')}</td>
       <td><span class="role-${u.role}">${u.role}</span></td>
       <td><span class="status-${u.active?'active':'inactive'}">${u.active?'Active':'Inactive'}</span></td>
       <td style="color:#888;font-size:11px;">${escHtml(u.created||'—')}</td>
       <td style="display:flex;gap:4px;flex-wrap:wrap;">
-        ${u.username !== 'admin' ? `
-          <button class="btn" style="font-size:10px;padding:3px 8px;background:#e8f4fd;color:#2980b9;" onclick="resetUserPassword('${escAttr(u.username)}')">🔑 Reset</button>
-          <button class="btn" style="font-size:10px;padding:3px 8px;background:${u.active?'#fff3cd':'#d4edda'};color:${u.active?'#856404':'#155724'};" onclick="toggleUserActive('${escAttr(u.username)}')">${u.active?'⏸ Deactivate':'▶ Activate'}</button>
-          <button class="btn" style="font-size:10px;padding:3px 8px;background:#fde8e8;color:#c0392b;" onclick="deleteUser('${escAttr(u.username)}')">🗑 Delete</button>
-        ` : '<span style="font-size:11px;color:#999;font-style:italic;">Default admin</span>'}
+        ${currentUser && currentUser.id !== u.id ? `
+          <button class="btn" style="font-size:10px;padding:3px 8px;background:#e8f4fd;color:#2980b9;" onclick="resetUserPassword('${escAttr(u.id)}','${escAttr(u.username)}')">🔑 Reset</button>
+          <button class="btn" style="font-size:10px;padding:3px 8px;background:${u.active?'#fff3cd':'#d4edda'};color:${u.active?'#856404':'#155724'};" onclick="toggleUserActive('${escAttr(u.id)}','${escAttr(u.username)}',${u.active})">${u.active?'⏸ Deactivate':'▶ Activate'}</button>
+          <button class="btn" style="font-size:10px;padding:3px 8px;background:#fde8e8;color:#c0392b;" onclick="deleteUser('${escAttr(u.id)}','${escAttr(u.username)}')">🗑 Delete</button>
+        ` : '<span style="font-size:11px;color:#999;font-style:italic;">Current user</span>'}
       </td>
     </tr>
   `).join('');
@@ -2540,31 +2546,37 @@ async function addUser() {
   const password = document.getElementById('new-password').value;
   const role = document.getElementById('new-role').value;
   if (!username || !email || !password) { showToast('Please fill all required fields'); return; }
-  if (getUsers().find(u => u.username === username)) { showToast('Username already exists'); return; }
-  const hash = await sha256(password);
-  const extra = JSON.parse(localStorage.getItem('vcfdd_users') || '[]');
-  extra.push({ username, email, role, passwordHash: hash, active: true, created: new Date().toISOString().split('T')[0] });
-  localStorage.setItem('vcfdd_users', JSON.stringify(extra));
+  const { data: { session } } = await supabase.auth.getSession();
+  const resp = await fetch(`${SUPABASE_URL}/functions/v1/manage-user`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+    body: JSON.stringify({ action: 'create', email, password, username, role })
+  });
+  const result = await resp.json();
+  if (!resp.ok) { showToast('Error: ' + (result.error || 'Unknown error')); return; }
   document.getElementById('new-username').value = '';
   document.getElementById('new-email').value = '';
   document.getElementById('new-password').value = '';
-  renderUserTable();
+  await renderUserTable();
   showToast('✅ User "' + username + '" created');
 }
 
-async function resetUserPassword(username) {
+async function resetUserPassword(userId, username) {
   const newPwd = prompt('New password for "' + username + '":');
   if (!newPwd) return;
-  const hash = await sha256(newPwd);
-  const extra = JSON.parse(localStorage.getItem('vcfdd_users') || '[]');
-  const u = extra.find(u => u.username === username);
-  if (u) { u.passwordHash = hash; localStorage.setItem('vcfdd_users', JSON.stringify(extra)); renderUserTable(); showToast('Password reset for "' + username + '"'); }
+  const { data: { session } } = await supabase.auth.getSession();
+  const resp = await fetch(`${SUPABASE_URL}/functions/v1/manage-user`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+    body: JSON.stringify({ action: 'reset_password', userId, password: newPwd })
+  });
+  if (resp.ok) showToast('Password reset for "' + username + '"');
+  else showToast('Error resetting password');
 }
 
-function toggleUserActive(username) {
-  const extra = JSON.parse(localStorage.getItem('vcfdd_users') || '[]');
-  const u = extra.find(u => u.username === username);
-  if (u) { u.active = !u.active; localStorage.setItem('vcfdd_users', JSON.stringify(extra)); renderUserTable(); showToast('User "' + username + '" ' + (u.active?'activated':'deactivated')); }
+async function toggleUserActive(userId, username, currentActive) {
+  const { error } = await supabase.from('profiles').update({ active: !currentActive }).eq('id', userId);
+  if (!error) { await renderUserTable(); showToast('User "' + username + '" ' + (!currentActive ? 'activated' : 'deactivated')); }
 }
 
 async function changeMyPassword() {
@@ -2574,22 +2586,11 @@ async function changeMyPassword() {
   statusEl.style.color = '#888';
   if (!currentPwd || !newPwd) { statusEl.textContent = 'Please fill both fields.'; return; }
   if (newPwd.length < 12) { statusEl.style.color = '#e74c3c'; statusEl.textContent = 'New password must be at least 12 characters.'; return; }
-  const currentHash = await sha256(currentPwd);
-  if (currentHash !== currentUser.passwordHash) { statusEl.style.color = '#e74c3c'; statusEl.textContent = 'Current password is incorrect.'; return; }
-  const newHash = await sha256(newPwd);
-  if (currentUser.username === 'admin') {
-    // For default admin, we store overridden password in localStorage
-    const override = JSON.parse(localStorage.getItem('vcfdd_admin_override') || '{}');
-    override.passwordHash = newHash;
-    localStorage.setItem('vcfdd_admin_override', JSON.stringify(override));
-    currentUser.passwordHash = newHash;
-  } else {
-    const extra = JSON.parse(localStorage.getItem('vcfdd_users') || '[]');
-    const u = extra.find(x => x.username === currentUser.username);
-    if (u) { u.passwordHash = newHash; localStorage.setItem('vcfdd_users', JSON.stringify(extra)); }
-    currentUser.passwordHash = newHash;
-  }
-  sessionStorage.setItem('vcfdd_session', JSON.stringify({ username: currentUser.username, role: currentUser.role }));
+  const { data: { user } } = await supabase.auth.getUser();
+  const { error: loginError } = await supabase.auth.signInWithPassword({ email: user.email, password: currentPwd });
+  if (loginError) { statusEl.style.color = '#e74c3c'; statusEl.textContent = 'Current password is incorrect.'; return; }
+  const { error } = await supabase.auth.updateUser({ password: newPwd });
+  if (error) { statusEl.style.color = '#e74c3c'; statusEl.textContent = 'Error: ' + error.message; return; }
   document.getElementById('chg-current-pwd').value = '';
   document.getElementById('chg-new-pwd').value = '';
   statusEl.style.color = '#27ae60';
@@ -2597,12 +2598,16 @@ async function changeMyPassword() {
   showToast('Password updated');
 }
 
-function deleteUser(username) {
+async function deleteUser(userId, username) {
   if (!confirm('Delete user "' + username + '"? This cannot be undone.')) return;
-  const extra = JSON.parse(localStorage.getItem('vcfdd_users') || '[]').filter(u => u.username !== username);
-  localStorage.setItem('vcfdd_users', JSON.stringify(extra));
-  renderUserTable();
-  showToast('User "' + username + '" deleted');
+  const { data: { session } } = await supabase.auth.getSession();
+  const resp = await fetch(`${SUPABASE_URL}/functions/v1/manage-user`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+    body: JSON.stringify({ action: 'delete', userId })
+  });
+  if (resp.ok) { await renderUserTable(); showToast('User "' + username + '" deleted'); }
+  else showToast('Error deleting user');
 }
 
 // EmailJS init
@@ -2611,6 +2616,7 @@ function deleteUser(username) {
 
 applyStoredTheme();
 init();
+initAuth();
 </script>
 </body>
 </html>
