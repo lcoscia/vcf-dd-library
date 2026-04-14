@@ -2241,22 +2241,22 @@ function toggleSidebar() {
 // ============================================================
 const SUPABASE_URL  = 'https://zpuwusopejoyrbpgamuw.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwdXd1c29wZWpveXJicGdhbXV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzEyNTEsImV4cCI6MjA5MTc0NzI1MX0.DgZfOfBs4NoT8pEF8D8yn2BnhdIMrZ1gX09zapfxEto';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 let currentUser = null;
 
 async function loadCurrentUser(userId) {
-  const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+  const { data } = await sb.from('profiles').select('*').eq('id', userId).single();
   if (data) currentUser = { ...data };
 }
 
 async function initAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await sb.auth.getSession();
   if (session) {
     await loadCurrentUser(session.user.id);
     if (currentUser?.active) enterPrivateMode();
   }
-  supabase.auth.onAuthStateChange(async (event) => {
+  sb.auth.onAuthStateChange(async (event) => {
     if (event === 'SIGNED_OUT') { currentUser = null; exitPrivateMode(); }
   });
 }
@@ -2267,13 +2267,13 @@ async function doLogin() {
   const errEl = document.getElementById('login-error');
   errEl.textContent = '';
   if (!username || !password) { errEl.textContent = 'Please fill in all fields.'; return; }
-  const { data: email, error: rpcErr } = await supabase.rpc('get_email_by_username', { p_username: username });
+  const { data: email, error: rpcErr } = await sb.rpc('get_email_by_username', { p_username: username });
   if (rpcErr || !email) { errEl.textContent = 'Unknown username.'; return; }
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
   if (error) { errEl.textContent = 'Invalid credentials.'; return; }
   await loadCurrentUser(data.user.id);
   if (!currentUser?.active) {
-    await supabase.auth.signOut();
+    await sb.auth.signOut();
     errEl.textContent = 'Account inactive. Contact the administrator.';
     return;
   }
@@ -2282,14 +2282,14 @@ async function doLogin() {
 }
 
 async function doLogout() {
-  await supabase.auth.signOut();
+  await sb.auth.signOut();
   currentUser = null;
   exitPrivateMode();
   showToast('Logged out from Private Library');
 }
 
 async function checkSession() {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await sb.auth.getSession();
   if (!session) return false;
   await loadCurrentUser(session.user.id);
   return !!(currentUser?.active);
@@ -2484,7 +2484,7 @@ function closeAdminPanel() { document.getElementById('admin-overlay').classList.
 
 async function renderUserTable() {
   document.getElementById('admin-user-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888;padding:16px;">Loading…</td></tr>';
-  const { data: users, error } = await supabase.from('profiles').select('*').order('created', { ascending: true });
+  const { data: users, error } = await sb.from('profiles').select('*').order('created', { ascending: true });
   if (error || !users) {
     document.getElementById('admin-user-tbody').innerHTML = '<tr><td colspan="6" style="color:red;padding:16px;">Error loading users</td></tr>';
     return;
@@ -2546,7 +2546,7 @@ async function addUser() {
   const password = document.getElementById('new-password').value;
   const role = document.getElementById('new-role').value;
   if (!username || !email || !password) { showToast('Please fill all required fields'); return; }
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await sb.auth.getSession();
   const resp = await fetch(`${SUPABASE_URL}/functions/v1/manage-user`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
@@ -2564,7 +2564,7 @@ async function addUser() {
 async function resetUserPassword(userId, username) {
   const newPwd = prompt('New password for "' + username + '":');
   if (!newPwd) return;
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await sb.auth.getSession();
   const resp = await fetch(`${SUPABASE_URL}/functions/v1/manage-user`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
@@ -2575,7 +2575,7 @@ async function resetUserPassword(userId, username) {
 }
 
 async function toggleUserActive(userId, username, currentActive) {
-  const { error } = await supabase.from('profiles').update({ active: !currentActive }).eq('id', userId);
+  const { error } = await sb.from('profiles').update({ active: !currentActive }).eq('id', userId);
   if (!error) { await renderUserTable(); showToast('User "' + username + '" ' + (!currentActive ? 'activated' : 'deactivated')); }
 }
 
@@ -2586,10 +2586,10 @@ async function changeMyPassword() {
   statusEl.style.color = '#888';
   if (!currentPwd || !newPwd) { statusEl.textContent = 'Please fill both fields.'; return; }
   if (newPwd.length < 12) { statusEl.style.color = '#e74c3c'; statusEl.textContent = 'New password must be at least 12 characters.'; return; }
-  const { data: { user } } = await supabase.auth.getUser();
-  const { error: loginError } = await supabase.auth.signInWithPassword({ email: user.email, password: currentPwd });
+  const { data: { user } } = await sb.auth.getUser();
+  const { error: loginError } = await sb.auth.signInWithPassword({ email: user.email, password: currentPwd });
   if (loginError) { statusEl.style.color = '#e74c3c'; statusEl.textContent = 'Current password is incorrect.'; return; }
-  const { error } = await supabase.auth.updateUser({ password: newPwd });
+  const { error } = await sb.auth.updateUser({ password: newPwd });
   if (error) { statusEl.style.color = '#e74c3c'; statusEl.textContent = 'Error: ' + error.message; return; }
   document.getElementById('chg-current-pwd').value = '';
   document.getElementById('chg-new-pwd').value = '';
@@ -2600,7 +2600,7 @@ async function changeMyPassword() {
 
 async function deleteUser(userId, username) {
   if (!confirm('Delete user "' + username + '"? This cannot be undone.')) return;
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await sb.auth.getSession();
   const resp = await fetch(`${SUPABASE_URL}/functions/v1/manage-user`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
