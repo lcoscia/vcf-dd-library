@@ -3,7 +3,7 @@
 An interactive single-page web application to browse, filter, edit, and export VMware Cloud Foundation Design Decisions — with a secured Private Library for Low-Level Blueprint Design Decisions.
 
 > **Author:** L.COSCIA  
-> **Version:** 1.5  
+> **Version:** 1.6  
 > **Data:** 1,500+ public DDs (VCF 9.0 embedded · VCF 9.1 via import) + 1,547 private Low-Level DDs across 5 blueprints
 
 ---
@@ -118,6 +118,12 @@ VCF_LowLevelDesignDecisions/     ← Source xlsx files (5 blueprints)
 ---
 
 ## Changelog
+
+### v1.6 — Invite Flow & Admin Fixes
+- Set-password modal when a user accepts an invite link (before first login)
+- Approve access request via **`generateLink`** — bypasses Supabase SMTP rate limit
+- Invite link copy-to-clipboard fallback modal for admin
+- Fixed action name mismatch (`create_user`, `delete_user`) between client and Edge Function
 
 ### v1.5 — Supabase Auth
 - Migrated authentication from localStorage/SHA-256 to **Supabase Auth** (bcrypt server-side)
