@@ -2630,10 +2630,16 @@ async function renderRequestsTable() {
 async function approveRequest(requestId, email) {
   const username = document.getElementById(`req-uname-${requestId}`)?.value.trim() || email.split('@')[0];
   const role = document.getElementById(`req-role-${requestId}`)?.value || 'user';
-  const { error } = await sb.functions.invoke('manage-user', {
+  const { data, error } = await sb.functions.invoke('manage-user', {
     body: { action: 'approve_request', requestId, email, username, role }
   });
-  if (error) { showToast('Error: ' + error.message); return; }
+  if (error) {
+    let msg = error.message;
+    try { const body = await error.context.json(); if (body?.error) msg = body.error; } catch {}
+    showToast('❌ Error: ' + msg);
+    console.error('approveRequest error:', msg, data);
+    return;
+  }
   await renderRequestsTable();
   showToast('✅ Approved — invite email sent to ' + email);
 }
