@@ -396,6 +396,11 @@
   #login-body { padding:20px 24px 24px; }
   .login-error { color:#e74c3c; font-size:11px; margin-top:5px; min-height:15px; }
 
+  /* ── SET PASSWORD MODAL (invite flow) ── */
+  #set-pwd-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:2100; align-items:center; justify-content:center; }
+  #set-pwd-overlay.open { display:flex; }
+  #set-pwd-box { background:white; border-radius:10px; width:380px; overflow:hidden; box-shadow:0 24px 64px rgba(0,0,0,0.4); }
+
   /* ── ACCESS REQUEST MODAL ── */
   #access-req-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:2000; align-items:center; justify-content:center; }
   #access-req-overlay.open { display:flex; }
@@ -1080,6 +1085,29 @@
         <span style="font-size:11px;color:#888;">Don't have access? </span>
         <button style="background:none;border:none;color:#6c5ce7;font-size:11px;font-weight:600;cursor:pointer;" onclick="closeLoginModal();openAccessRequestModal()">Request Access</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SET PASSWORD MODAL (invite flow) ── -->
+<div id="set-pwd-overlay">
+  <div id="set-pwd-box">
+    <div style="background:linear-gradient(135deg,#1a1a2e,#27ae60);padding:28px 24px 20px;color:white;text-align:center;">
+      <div style="font-size:40px;margin-bottom:6px;">🔑</div>
+      <h2 style="font-size:15px;font-weight:700;margin-bottom:2px;">Set Your Password</h2>
+      <p style="font-size:11px;opacity:0.75;">Your account is ready. Choose a password to access the Private Library.</p>
+    </div>
+    <div style="padding:20px 24px 24px;">
+      <div class="field-group" style="margin-bottom:10px;">
+        <label>New Password</label>
+        <input type="password" id="set-pwd-input" placeholder="At least 8 characters" autocomplete="new-password" onkeydown="if(event.key==='Enter')doSetPassword()">
+      </div>
+      <div class="field-group" style="margin-bottom:6px;">
+        <label>Confirm Password</label>
+        <input type="password" id="set-pwd-confirm" placeholder="Repeat your password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doSetPassword()">
+      </div>
+      <div class="login-error" id="set-pwd-error"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:10px;background:#27ae60;border-color:#27ae60;" onclick="doSetPassword()">✅ Set Password &amp; Sign In</button>
     </div>
   </div>
 </div>
@@ -2277,6 +2305,9 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
 
 let currentUser = null;
 
+// Detect Supabase invite token in URL hash before it gets consumed
+const _isInviteFlow = window.location.hash.includes('type=invite');
+
 async function loadCurrentUser(userId) {
   const { data } = await sb.from('profiles').select('*').eq('id', userId).single();
   if (data) currentUser = { ...data };
@@ -2285,12 +2316,59 @@ async function loadCurrentUser(userId) {
 async function initAuth() {
   const { data: { session } } = await sb.auth.getSession();
   if (session) {
+    if (_isInviteFlow) {
+      // User clicked invite link — clear the hash and ask them to set a password
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+      openSetPasswordModal();
+      return;
+    }
     await loadCurrentUser(session.user.id);
     if (currentUser?.active) enterPrivateMode();
   }
   sb.auth.onAuthStateChange(async (event) => {
     if (event === 'SIGNED_OUT') { currentUser = null; exitPrivateMode(); }
   });
+}
+
+function openSetPasswordModal() {
+  document.getElementById('set-pwd-input').value = '';
+  document.getElementById('set-pwd-confirm').value = '';
+  document.getElementById('set-pwd-error').textContent = '';
+  document.getElementById('set-pwd-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('set-pwd-input').focus(), 100);
+}
+
+function closeSetPasswordModal() {
+  document.getElementById('set-pwd-overlay').classList.remove('open');
+}
+
+async function doSetPassword() {
+  const pwd  = document.getElementById('set-pwd-input').value;
+  const pwd2 = document.getElementById('set-pwd-confirm').value;
+  const errEl = document.getElementById('set-pwd-error');
+  errEl.textContent = '';
+  if (pwd.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; return; }
+  if (pwd !== pwd2)   { errEl.textContent = 'Passwords do not match.'; return; }
+
+  const btn = document.querySelector('#set-pwd-box button.btn-primary');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  const { error } = await sb.auth.updateUser({ password: pwd });
+  btn.disabled = false;
+  btn.innerHTML = '✅ Set Password &amp; Sign In';
+
+  if (error) { errEl.textContent = error.message; return; }
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) await loadCurrentUser(session.user.id);
+
+  closeSetPasswordModal();
+  if (currentUser?.active) {
+    enterPrivateMode();
+  } else {
+    showToast('✅ Password set! Your account is pending activation by the admin.');
+  }
 }
 
 async function doLogin() {
