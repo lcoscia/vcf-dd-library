@@ -2,3 +2,10 @@
 *.xlsx
 .claude/
 data.json
+
+# Secrets & credentials
+.env
+.env.*
+*.local
+secrets.*
+credentials.*
