@@ -2758,7 +2758,7 @@ async function addUser() {
   const role = document.getElementById('new-role').value;
   if (!username || !email || !password) { showToast('Please fill all required fields'); return; }
   const { data, error } = await sb.functions.invoke('manage-user', {
-    body: { action: 'create', email, password, username, role }
+    body: { action: 'create_user', email, password, username, role }
   });
   if (error) { showToast('Error: ' + error.message); return; }
   document.getElementById('new-username').value = '';
@@ -2805,7 +2805,7 @@ async function changeMyPassword() {
 async function deleteUser(userId, username) {
   if (!confirm('Delete user "' + username + '"? This cannot be undone.')) return;
   const { error } = await sb.functions.invoke('manage-user', {
-    body: { action: 'delete', userId }
+    body: { action: 'delete_user', userId }
   });
   if (!error) { await renderUserTable(); showToast('User "' + username + '" deleted'); }
   else showToast('Error deleting user');
