@@ -875,7 +875,7 @@
       <div style="display:flex;gap:20px;font-size:11px;opacity:0.8;margin-top:8px;">
         <span>👤 Author: <strong>L.COSCIA</strong></span>
         <span>🏢 <strong>ITQ</strong></span>
-        <span>📅 Version: 1.5</span>
+        <span>📅 Version: 1.6</span>
         <span id="about-dd-count">📊 Design Decisions</span>
       </div>
     </div>
@@ -962,6 +962,17 @@
       <div>
         <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#0074d9;margin-bottom:10px;">📋 Changelog</h3>
         <div style="font-size:12px;border-left:3px solid #0074d9;padding-left:14px;display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <div style="font-weight:700;color:#1a1a2e;">v1.6 — Invite Flow &amp; Admin Fixes</div>
+            <div style="color:#666;margin-top:3px;">
+              <ul style="margin:4px 0 0 14px;padding:0;display:flex;flex-direction:column;gap:3px;">
+                <li>Set-password modal when accepting an invite link.</li>
+                <li>Approve request via <strong>generateLink</strong> (bypasses Supabase SMTP rate limit).</li>
+                <li>Invite link copy-to-clipboard fallback for admin.</li>
+                <li>Fixed action name mismatch for <code>create_user</code> and <code>delete_user</code>.</li>
+              </ul>
+            </div>
+          </div>
           <div>
             <div style="font-weight:700;color:#1a1a2e;">v1.5 — Supabase Auth</div>
             <div style="color:#666;margin-top:3px;">
@@ -1058,7 +1069,7 @@
 <!-- Footer -->
 <div id="footer">
   <svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="#aaa"/></svg>
-  Généré par Claude · L.COSCIA
+  L.COSCIA · v1.6
 </div>
 
 
