@@ -1126,6 +1126,24 @@
       <button onclick="closeAdminPanel()" style="background:rgba(255,255,255,0.15);border:none;color:white;font-size:18px;cursor:pointer;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">&times;</button>
     </div>
     <div class="admin-body">
+      <!-- Pending Requests -->
+      <div style="background:#f0f7ff;border-radius:8px;padding:14px 16px;margin-bottom:16px;border:1px solid #b3d4f5;">
+        <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;color:#0074d9;letter-spacing:0.5px;margin-bottom:10px;">
+          📬 Pending Access Requests
+          <span id="requests-badge" style="display:none;background:#e74c3c;color:white;border-radius:10px;padding:1px 8px;font-size:10px;font-weight:700;margin-left:6px;">0</span>
+        </h3>
+        <div style="overflow-x:auto;">
+          <table class="user-table">
+            <thead>
+              <tr>
+                <th>Name</th><th>Email</th><th>Company</th><th>Reason</th><th>Date</th><th>Username</th><th>Role</th><th style="width:160px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="requests-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- Add User Form -->
       <div style="background:#f5f7fa;border-radius:8px;padding:14px 16px;margin-bottom:16px;border:1px solid #e0e4ea;">
         <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;color:#0074d9;letter-spacing:0.5px;margin-bottom:10px;">➕ Add New User</h3>
@@ -2463,7 +2481,7 @@ function openAccessRequestModal() {
 }
 function closeAccessRequestModal() { document.getElementById('access-req-overlay').classList.remove('open'); }
 
-function sendAccessRequest() {
+async function sendAccessRequest() {
   const name = document.getElementById('req-name').value.trim();
   const email = document.getElementById('req-email').value.trim();
   const company = document.getElementById('req-company').value.trim();
@@ -2471,19 +2489,18 @@ function sendAccessRequest() {
   const statusEl = document.getElementById('req-status');
   if (!name || !email || !company || !reason) { statusEl.textContent = 'Please fill all fields.'; return; }
   statusEl.textContent = 'Sending request...';
-  emailjs.send('service_86sbc2i', 'template_e76q1co', {
-    from_name: name,
-    from_email: email,
-    company: company,
-    reason: reason
-  }).then(() => {
-    statusEl.style.color = '#27ae60';
-    statusEl.textContent = '✅ Request sent successfully! You will be contacted shortly.';
-    setTimeout(() => closeAccessRequestModal(), 3500);
-  }).catch(() => {
+  const { error } = await sb.from('access_requests').insert({ username: name, email, company, reason });
+  if (error) {
     statusEl.style.color = '#e74c3c';
     statusEl.textContent = '❌ Error sending request. Please try again.';
-  });
+    return;
+  }
+  emailjs.send('service_86sbc2i', 'template_e76q1co', {
+    from_name: name, from_email: email, company, reason
+  }).catch(() => {});
+  statusEl.style.color = '#27ae60';
+  statusEl.textContent = '✅ Request sent successfully! You will be contacted shortly.';
+  setTimeout(() => closeAccessRequestModal(), 3500);
 }
 
 // ============================================================
@@ -2492,9 +2509,62 @@ function sendAccessRequest() {
 async function openAdminPanel() {
   if (!currentUser || currentUser.role !== 'admin') { showToast('Admin access required'); return; }
   document.getElementById('admin-overlay').classList.add('open');
-  await renderUserTable();
+  await Promise.all([renderRequestsTable(), renderUserTable()]);
 }
 function closeAdminPanel() { document.getElementById('admin-overlay').classList.remove('open'); }
+
+async function renderRequestsTable() {
+  const tbody = document.getElementById('requests-tbody');
+  const badge = document.getElementById('requests-badge');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#888;padding:12px;">Loading…</td></tr>';
+  const { data: requests, error } = await sb.from('access_requests')
+    .select('*').eq('status', 'pending').order('created_at', { ascending: true });
+  if (error || !requests) {
+    tbody.innerHTML = '<tr><td colspan="8" style="color:red;padding:12px;">Error loading requests</td></tr>';
+    return;
+  }
+  if (requests.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#888;padding:12px;font-style:italic;">No pending requests</td></tr>';
+    badge.style.display = 'none';
+    return;
+  }
+  badge.textContent = requests.length;
+  badge.style.display = 'inline';
+  tbody.innerHTML = requests.map(r => `
+    <tr>
+      <td><strong>${escHtml(r.username)}</strong></td>
+      <td>${escHtml(r.email)}</td>
+      <td>${escHtml(r.company||'—')}</td>
+      <td style="max-width:180px;white-space:normal;font-size:11px;color:#555;">${escHtml(r.reason||'—')}</td>
+      <td style="color:#888;font-size:11px;">${r.created_at ? new Date(r.created_at).toLocaleDateString() : '—'}</td>
+      <td><input type="text" id="req-uname-${escAttr(r.id)}" value="${escAttr(r.username)}" style="width:90px;padding:3px 6px;border:1px solid #d0d5dd;border-radius:4px;font-size:12px;"></td>
+      <td><select id="req-role-${escAttr(r.id)}" style="padding:3px 6px;border:1px solid #d0d5dd;border-radius:4px;font-size:12px;">
+        <option value="user">User</option><option value="admin">Admin</option>
+      </select></td>
+      <td style="display:flex;gap:4px;">
+        <button class="btn" style="font-size:10px;padding:3px 8px;background:#d4edda;color:#155724;" onclick="approveRequest('${escAttr(r.id)}','${escAttr(r.email)}')">✅ Approve</button>
+        <button class="btn" style="font-size:10px;padding:3px 8px;background:#fde8e8;color:#c0392b;" onclick="rejectRequest('${escAttr(r.id)}')">✗ Reject</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function approveRequest(requestId, email) {
+  const username = document.getElementById(`req-uname-${requestId}`)?.value.trim() || email.split('@')[0];
+  const role = document.getElementById(`req-role-${requestId}`)?.value || 'user';
+  const { error } = await sb.functions.invoke('manage-user', {
+    body: { action: 'approve_request', requestId, email, username, role }
+  });
+  if (error) { showToast('Error: ' + error.message); return; }
+  await renderRequestsTable();
+  showToast('✅ Approved — invite email sent to ' + email);
+}
+
+async function rejectRequest(requestId) {
+  if (!confirm('Reject this request?')) return;
+  const { error } = await sb.from('access_requests').update({ status: 'rejected' }).eq('id', requestId);
+  if (!error) { await renderRequestsTable(); showToast('Request rejected'); }
+}
 
 async function renderUserTable() {
   document.getElementById('admin-user-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888;padding:16px;">Loading…</td></tr>';
