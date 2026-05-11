@@ -1,26 +1,25 @@
 # VCF Design Decision Library
 
-An interactive single-page web application to browse, filter, edit, and export VMware Cloud Foundation Design Decisions — with a secured Private Library for Low-Level Blueprint Design Decisions.
+An interactive single-page web application to browse, filter, edit, and export VMware Cloud Foundation Design Decisions — with full access to Blueprint Deployment References across all 5 VCF Fleet blueprints.
 
 > **Author:** L.COSCIA  
-> **Version:** 1.6  
-> **Data:** 1,500+ public DDs (VCF 9.0 embedded · VCF 9.1 via import) + 1,547 private Low-Level DDs across 5 blueprints
+> **Version:** 2.0  
+> **Data:** 670 Design Decisions (VCF 9.0 embedded · VCF 9.1 via import) across 28 components + 5 VCF Fleet blueprints
 
 ---
 
 ## Overview
 
-This tool provides a fast, offline-capable interface for the VCF Design Library. All data is embedded directly in the HTML — no server, no dependencies, just open `index.html` in any modern browser.
-
-A **Private Library** section gives authenticated users access to Low-Level Design Decisions for all 5 VCF Fleet deployment blueprints, with High Level Deployment Requirements sourced from Broadcom TechDocs.
+This tool provides a fast, offline-capable interface for the VCF Design Library. All data is embedded directly in the HTML — no server, no dependencies, just open `index.html` in any modern browser. No login required.
 
 ---
 
 ## Features
 
-### Public Section
 | Feature | Description |
 |---|---|
+| 📐 **Blueprint View** | Switch between all 5 VCF Fleet blueprints with High Level Deployment Requirements (Physical Hosts, VLANs, Virtual Networking) |
+| 📚 **Design Library View** | Full access to all 670 Design Decisions across 28 components — toggle via the tab bar |
 | 🔀 **Multi-version Support** | Switch between VCF 9.0 and VCF 9.1 via the header dropdown |
 | 🔍 **Search & Filter** | Full-text search across all fields. Filter by Component, Type, Category, Status, Criticality and Marked status |
 | ⊞ **Group by Category** | Toggle category grouping with collapsible sections |
@@ -36,49 +35,28 @@ A **Private Library** section gives authenticated users access to Low-Level Desi
 | 🌙 **Dark Theme** | Toggle dark/light mode — preference persisted in `localStorage` |
 | 📱 **Responsive** | Sidebar collapses to a slide-in drawer on mobile/tablet |
 
-### Private Section (Authentication Required)
-| Feature | Description |
-|---|---|
-| 🔒 **Secure Login** | Supabase Auth (bcrypt server-side), sessions JWT persistantes cross-browser |
-| 📋 **Blueprint Selector** | Switch between all 5 VCF Fleet blueprints |
-| 📊 **Low-Level DDs** | 1,547 Low-Level Design Decisions across 5 blueprints |
-| 🏗️ **HLR Panel** | High Level Deployment Requirements per blueprint (from Broadcom TechDocs) |
-| 📧 **Access Request** | Built-in form to request access — email sent automatically to admin via EmailJS |
-| ⚙️ **Admin Panel** | Centralized user management: add, activate/deactivate, reset password, delete |
-
 ---
 
-## VCF Fleet Blueprints (Private Library)
+## VCF Fleet Blueprints
 
-| Blueprint | Design Decisions |
+| Blueprint | Description |
 |---|---|
-| VCF Fleet in a Single Site | 312 |
-| VCF Fleet in a Single Site with Minimal Footprint | 275 |
-| VCF Fleet with Multiple Sites in a Single Region | 322 |
-| VCF Fleet with Multiple Sites in a Single Region plus Additional Region(s) | 322 |
-| VCF Fleet with Multiple Sites Across Multiple Regions | 316 |
+| VCF Fleet in a Single Site | Single-site standard deployment |
+| VCF Fleet in a Single Site with Minimal Footprint | Single-site minimal footprint |
+| VCF Fleet with Multiple Sites in a Single Region | Multi-site, single region |
+| VCF Fleet with Multiple Sites in a Single Region plus Additional Region(s) | Multi-site, multi-region |
+| VCF Fleet with Multiple Sites Across Multiple Regions | Full multi-region |
 
 ---
 
 ## Usage
 
-### Access the Private Library
-Click **🔒 Private Library** in the header. If not authenticated, a login modal appears. Contact the administrator to obtain your credentials.
+### Switch between Blueprint and Design Library
+Use the **tab bar** at the top of the content area to toggle between:
+- **📐 Blueprint** — selects one of 5 VCF Fleet blueprints; shows the HLR panel (Physical Hosts, VLANs, Virtual Networking) and the blueprint's design decisions
+- **📚 Design Library** — shows the full 670-DD library with all filters active
 
-### Request Access
-Click **Request Access** in the login modal to open the access request form. The admin receives an email automatically.
-
-### Admin Panel
-Accessible to admin users via the **⚙️ Admin** button in the header (visible when logged in as admin):
-- **Add user**: fill in username, email, password and role
-- **Reset password**: click 🔑 Reset next to any user
-- **Deactivate/Activate**: temporarily block or restore access
-- **Delete**: permanently remove a user account
-
-### Switch Blueprint (Private Mode)
-Use the **Blueprint** dropdown in the purple toolbar to switch between VCF Fleet blueprints. The High Level Deployment Requirements panel updates automatically.
-
-### Switch VCF version (Public Mode)
+### Switch VCF version
 Use the **version dropdown** in the header to switch between VCF 9.0 and VCF 9.1.
 
 ### Export your selection
@@ -99,11 +77,7 @@ VCF_LowLevelDesignDecisions/     ← Source xlsx files (5 blueprints)
 
 ## Technical Details
 
-- **Pure HTML/CSS/JS** — no framework, no build step
-- **Authentication**: [Supabase Auth](https://supabase.com) — bcrypt server-side, JWT sessions (ES256), cross-browser persistent
-- **User management**: Supabase Edge Function (`manage-user`) — create, reset password, delete via service role key (never exposed client-side)
-- **Database**: Supabase PostgreSQL — `profiles` table with Row Level Security
-- **Email**: [EmailJS](https://emailjs.com) for access request notifications (no backend required)
+- **Pure HTML/CSS/JS** — no framework, no build step, no authentication
 - **SheetJS (xlsx.js)** loaded from CDN for Excel import/export
 - ~1.5 MB total file size (includes all embedded blueprint data)
 
@@ -111,13 +85,23 @@ VCF_LowLevelDesignDecisions/     ← Source xlsx files (5 blueprints)
 
 ## Data Sources
 
-- **Public DDs**: VMware Cloud Foundation 9.0 Design Library (`.xlsx`) + Broadcom TechDocs
-- **Private DDs**: VCF Fleet Blueprint Design Decision Workbooks (5 `.xlsx` files)
+- **DDs**: VMware Cloud Foundation 9.0 Design Library (`.xlsx`) + Broadcom TechDocs
+- **Blueprint DDs**: VCF Fleet Blueprint Design Decision Workbooks (5 `.xlsx` files)
 - **High Level Requirements**: [Broadcom TechDocs — VCF 9.0 Blueprints](https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-0/design/blueprints.html)
 
 ---
 
 ## Changelog
+
+### v2.0 — Open Access & Data Quality
+- Removed authentication gate — app is now fully public with no login required
+- Removed Supabase, EmailJS SDKs and all auth/admin code (~756 lines)
+- Added **Design Library tab**: toggle between Blueprint view and full 670-DD library
+- Blueprint toolbar and HLR panel now always visible on load
+- Fixed **20 duplicate IDs** (sequential renumbering or -A/B/C/D suffixes for option groups)
+- Fixed 1 malformed ID (`VCF-VSAN-SC_RCMD-001` → `VCF-VSAN-SC-RCMD-001`) and 2 REQD/RCMD type mismatches
+- Removed **6 legacy SDDC Manager entries** superseded by VCF Operations in VCF 9
+- Dataset: 685 → **670 Design Decisions** across **28 components**
 
 ### v1.6 — Invite Flow & Admin Fixes
 - Set-password modal when a user accepts an invite link (before first login)
@@ -127,10 +111,9 @@ VCF_LowLevelDesignDecisions/     ← Source xlsx files (5 blueprints)
 
 ### v1.5 — Supabase Auth
 - Migrated authentication from localStorage/SHA-256 to **Supabase Auth** (bcrypt server-side)
-- Sessions JWT persistantes : fonctionne en navigation privée et sur tous les navigateurs
-- User management via **Supabase Edge Function** — la clé service role n'est jamais exposée côté client
-- Base de données **Supabase PostgreSQL** avec Row Level Security sur la table `profiles`
-- Réutilisable pour tous les futurs outils du projet
+- Persistent JWT sessions across browsers and private navigation
+- User management via **Supabase Edge Function** — service role key never exposed client-side
+- Supabase PostgreSQL with Row Level Security on `profiles` table
 
 ### v1.4 — Private Library & Admin Panel
 - Added **Private Library** section with SHA-256 authentication and session management
