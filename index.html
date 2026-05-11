@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VCF Design Decision Library</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" crossorigin="anonymous"></script>
 
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1898,7 +1898,8 @@ function onDrop(e) {
 function handleFileSelect(e) { if (e.target.files[0]) processImportFile(e.target.files[0]); }
 
 function processImportFile(file) {
-  if (!file.name.endsWith('.xlsx')) {
+  const validMime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  if (!file.name.endsWith('.xlsx') || (file.type && file.type !== validMime)) {
     document.getElementById('import-status').textContent = 'Error: Please select an .xlsx file.';
     return;
   }
@@ -1907,7 +1908,7 @@ function processImportFile(file) {
   reader.onload = function(e) {
     try {
       const XLSX = window.XLSX;
-      const wb = XLSX.read(e.target.result, {type: 'array'});
+      const wb = XLSX.read(e.target.result, {type: 'array', cellFormula: false, cellHTML: false});
       const wsName = wb.SheetNames.find(n => n.includes('Design Library')) || wb.SheetNames[0];
       const ws = wb.Sheets[wsName];
       const rows = XLSX.utils.sheet_to_json(ws, {header: 1, defval: null});
