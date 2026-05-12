@@ -3,8 +3,8 @@
 An interactive single-page web application to browse, filter, edit, and export VMware Cloud Foundation Design Decisions — with full access to Blueprint Deployment References across all 5 VCF Fleet blueprints.
 
 > **Author:** L.COSCIA  
-> **Version:** 2.0  
-> **Data:** 670 Design Decisions (VCF 9.0 embedded · VCF 9.1 via import) across 28 components + 5 VCF Fleet blueprints
+> **Version:** 2.1  
+> **Data:** 687 Design Decisions VCF 9.0 (670 Excel + 17 Web Doc) · 818 Design Decisions VCF 9.1 (Web Doc) across 28 components + 5 VCF Fleet blueprints
 
 ---
 
@@ -92,6 +92,11 @@ VCF_LowLevelDesignDecisions/     ← Source xlsx files (5 blueprints)
 ---
 
 ## Changelog
+
+### v2.1 — VCF 9.1 Embedded Data
+- Scraped **217 pages** from Broadcom TechDocs VCF 9.1 Design Library — **818 Design Decisions embedded** (Web Doc), 24 components including Private AI, vDefend, Load Balancing, Data Services Manager
+- Scraped **164 pages** from Broadcom TechDocs VCF 9.0 Design Library — 17 net-new DDs added, dataset 670 → **687 Design Decisions**
+- Version-aware empty state (reserved for future Excel 9.1 data)
 
 ### v2.0 — Open Access & Data Quality
 - Removed authentication gate — app is now fully public with no login required
