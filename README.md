@@ -4,7 +4,7 @@ An interactive single-page web application to browse, filter, edit, and export V
 
 > **Author:** L.COSCIA  
 > **Version:** 2.1  
-> **Data:** 687 Design Decisions VCF 9.0 (670 Excel + 17 Web Doc) · 818 Design Decisions VCF 9.1 (Web Doc) across 28 components + 5 VCF Fleet blueprints
+> **Data:** 687 DDs VCF 9.0 (670 Excel + 17 Web Doc) · 998 DDs VCF 9.1 (772 Both + 166 Excel + 60 Web Doc) · 19 Blueprints (5 fleet topologies + 14 VCF 9.1)
 
 ---
 
@@ -93,10 +93,11 @@ VCF_LowLevelDesignDecisions/     ← Source xlsx files (5 blueprints)
 
 ## Changelog
 
-### v2.1 — VCF 9.1 Embedded Data
-- Scraped **217 pages** from Broadcom TechDocs VCF 9.1 Design Library — **818 Design Decisions embedded** (Web Doc), 24 components including Private AI, vDefend, Load Balancing, Data Services Manager
-- Scraped **164 pages** from Broadcom TechDocs VCF 9.0 Design Library — 17 net-new DDs added, dataset 670 → **687 Design Decisions**
-- Version-aware empty state (reserved for future Excel 9.1 data)
+### v2.1 — VCF 9.1 Full Dataset
+- Integrated official Broadcom Excel (VCF 9.1) + web cross-reference — **998 Design Decisions** (772 Both · 166 Excel · 60 Web Doc)
+- Added **14 new VCF 9.1 blueprints** with HLR data: Fleet Management, Monitoring, Troubleshooting, Edge (×3), Multi-Tenant, VKS, Private AI, vDefend, Backup & Restore, Instance Recovery, Fleet DR, Cyber Recovery
+- Blueprint selector reorganized into 4 categories (19 blueprints total)
+- Scraped **164 pages** from VCF 9.0 Design Library — **687 Design Decisions** (670 Excel + 17 Web Doc)
 
 ### v2.0 — Open Access & Data Quality
 - Removed authentication gate — app is now fully public with no login required
