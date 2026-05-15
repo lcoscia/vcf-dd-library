@@ -101,7 +101,7 @@
 
   /* Table area */
   #table-wrap { flex: 1; overflow: auto; }
-  table { border-collapse: collapse; font-size: 12px; table-layout: fixed; width: max-content; min-width: 100%; }
+  table { border-collapse: collapse; font-size: 12px; table-layout: fixed; width: 100%; min-width: 900px; }
   thead th {
     position: sticky; top: 0; z-index: 10;
     background: #f7f8fa; border-bottom: 2px solid #d0d5dd;
@@ -120,6 +120,17 @@
     background: transparent;
   }
   .col-resize-handle:hover, .col-resize-handle.dragging { background: #0074d9; opacity: 0.5; }
+
+  /* Collapsed columns */
+  thead th.col-hidden {
+    width: 8px !important; min-width: 8px !important;
+    padding: 0 !important; overflow: hidden;
+    background: #dce3f0 !important;
+  }
+  thead th.col-hidden .col-resize-handle { width: 8px; background: rgba(0,116,217,0.3); opacity: 1; }
+  tbody td.col-hidden { padding: 0 !important; overflow: hidden; }
+  body.dark thead th.col-hidden { background: #252550 !important; }
+  body.dark thead th.col-hidden .col-resize-handle { background: rgba(85,153,255,0.3); }
   thead th { position: sticky; top: 0; }
   tbody tr { border-bottom: 1px solid #e8ecf0; transition: background 0.1s; }
   tbody tr:hover { background: #f0f7ff; }
@@ -130,7 +141,9 @@
   tbody td.id-cell .id-link:hover { text-decoration: underline; color: #003d7a; }
   body.dark tbody td.id-cell .id-link:hover { color: #88bbff; }
   .cell-content { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
-  .cell-content.expanded { white-space: pre-wrap; word-break: break-word; }
+  .cell-content.expanded { white-space: pre-wrap; word-break: break-word; overflow: visible; text-overflow: clip; }
+  tbody td.cell-expanded { overflow: visible; cursor: zoom-out; }
+  tbody td:has(.cell-content):not(.cell-expanded) { cursor: zoom-in; }
   .text-preview { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 240px; }
   .expand-btn { background: none; border: none; color: #0074d9; cursor: pointer; font-size: 10px; padding: 0; margin-left: 4px; }
   .badge-compliant { background: #d4edda; color: #155724; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
@@ -625,16 +638,16 @@
           <tr>
             <th class="no-sort mark-th">⭐</th>
             <th class="no-sort" style="width:36px;min-width:36px;"><div class="cb-all"><input type="checkbox" id="cb-all" onchange="toggleSelectAll(this)"></div></th>
-            <th onclick="sortTable('subsection')" style="width:200px;">Category<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
-            <th onclick="sortTable('id')" style="width:200px;">ID<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
-            <th onclick="sortTable('component')" style="width:130px;">Component<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
-            <th onclick="sortTable('type')" style="width:110px;">Type<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
-            <th onclick="sortTable('source')" style="width:90px;">Source<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
-            <th class="no-sort" style="width:280px;">Design Decision<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
-            <th class="no-sort" style="width:280px;">Justification<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
-            <th onclick="sortTable('compliant_status')" style="width:100px;">Status<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
-            <th onclick="sortTable('criticality')" style="width:100px;">Criticality<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
-            <th class="no-sort" style="width:180px;">Notes<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
+            <th onclick="sortTable('subsection')" style="width:130px;">Category<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
+            <th onclick="sortTable('id')" style="width:150px;">ID<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
+            <th onclick="sortTable('component')" style="width:90px;">Component<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
+            <th onclick="sortTable('type')" style="width:80px;">Type<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
+            <th onclick="sortTable('source')" style="width:65px;">Source<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
+            <th class="no-sort" style="width:190px;">Design Decision<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
+            <th class="no-sort" style="width:170px;">Justification<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
+            <th onclick="sortTable('compliant_status')" style="width:85px;">Status<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
+            <th onclick="sortTable('criticality')" style="width:85px;">Criticality<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
+            <th class="no-sort" style="width:110px;">Notes<span class="col-resize-handle" onmousedown="startResize(event,this)"></span></th>
           </tr>
         </thead>
         <tbody id="table-body"></tbody>
@@ -1551,6 +1564,7 @@ function renderTable() {
 
   updateSelectionInfo();
   renderStats();
+  applyCollapsedToCells();
 }
 
 function makeRow(d) {
@@ -1594,6 +1608,15 @@ function makeRow(d) {
   tr.addEventListener('click', (e) => {
     if (e.target.type === 'checkbox' || e.target.classList.contains('mark-btn')) return;
     toggleSelect(d._uid, null, tr);
+  });
+  tr.querySelectorAll('td').forEach(td => {
+    const content = td.querySelector('.cell-content');
+    if (!content) return;
+    td.addEventListener('dblclick', e => {
+      e.stopPropagation();
+      const isExpanded = content.classList.toggle('expanded');
+      td.classList.toggle('cell-expanded', isExpanded);
+    });
   });
   return tr;
 }
@@ -2118,11 +2141,16 @@ function showToast(msg) {
 // ============================================================
 // COLUMN RESIZE
 // ============================================================
+const HIDE_THRESHOLD = 30;   // px — below this width, collapse the column
+const COLLAPSED_WIDTH = 8;   // px — width when collapsed
+const collapsedCols = new Set(); // column indices currently hidden
 let resizing = null;
 
 function startResize(e, handle) {
   e.preventDefault();
   e.stopPropagation();
+  // Block the click event that fires after mouseup so it doesn't trigger th sort
+  handle.addEventListener('click', e => e.stopPropagation(), { once: true });
   const th = handle.parentElement;
   const startX = e.clientX;
   const startWidth = th.offsetWidth;
@@ -2135,9 +2163,22 @@ function startResize(e, handle) {
 
 function onResizeMove(e) {
   if (!resizing) return;
-  const newWidth = Math.max(50, resizing.startWidth + e.clientX - resizing.startX);
-  resizing.th.style.width = newWidth + 'px';
-  resizing.th.style.minWidth = newWidth + 'px';
+  const newWidth = Math.max(COLLAPSED_WIDTH, resizing.startWidth + e.clientX - resizing.startX);
+  const th = resizing.th;
+  const colIdx = Array.from(th.parentElement.children).indexOf(th);
+
+  if (newWidth <= HIDE_THRESHOLD) {
+    th.style.width = COLLAPSED_WIDTH + 'px';
+    th.style.minWidth = COLLAPSED_WIDTH + 'px';
+    th.classList.add('col-hidden');
+    collapsedCols.add(colIdx);
+  } else {
+    th.style.width = newWidth + 'px';
+    th.style.minWidth = newWidth + 'px';
+    th.classList.remove('col-hidden');
+    collapsedCols.delete(colIdx);
+  }
+  applyCollapsedToCells();
 }
 
 function onResizeUp() {
@@ -2146,6 +2187,19 @@ function onResizeUp() {
   resizing = null;
   document.removeEventListener('mousemove', onResizeMove);
   document.removeEventListener('mouseup', onResizeUp);
+}
+
+function applyCollapsedToCells() {
+  const tbody = document.getElementById('table-body');
+  for (const row of tbody.rows) {
+    Array.from(row.cells).forEach((cell, idx) => {
+      if (collapsedCols.has(idx)) {
+        cell.classList.add('col-hidden');
+      } else {
+        cell.classList.remove('col-hidden');
+      }
+    });
+  }
 }
 
 // ============================================================
