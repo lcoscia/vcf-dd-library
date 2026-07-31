@@ -44,6 +44,7 @@
     --badge-neutral-bg: #E4E6EA; --badge-neutral-text: #495057;
     --badge-rec-bg: #e2d9f3;     --badge-rec-text: #4a1d96;
     --badge-excel-bg: #cce5ff;   --badge-excel-text: #004085;
+    --blue-accent-strong: #cc3f34; /* darkened --blue-accent for white-text fills — 4.85:1 vs raw accent's 3.26:1 (fails WCAG AA) */
   }
   body.dark {
     --gray-light: #191A30;
@@ -52,6 +53,7 @@
     --text-muted: #B6B8C8;
     --surface: #24263F;
     --blue-accent: #FF6F63;
+    --blue-accent-strong: #bf534a; /* darkened dark-mode --blue-accent for white-text fills — 4.61:1 */
 
     --surface-2: #1e1e38;
     --border-strong: #33355A;
@@ -107,7 +109,7 @@
     transition: all 0.15s;
   }
   .btn:hover { filter: brightness(1.1); }
-  .btn-primary { background: var(--blue-accent); color: white; }
+  .btn-primary { background: var(--blue-accent-strong); color: white; }
   .btn-success { background: var(--green); color: white; }
   .btn-warning { background: var(--orange); color: white; }
   .btn-danger { background: var(--red); color: white; }
@@ -233,7 +235,7 @@
     border-radius: 5px; cursor: pointer; font-size: 12px; color: var(--text-dark);
   }
   .page-btn:hover { background: color-mix(in srgb, var(--blue-mid) 8%, var(--surface)); border-color: var(--blue-accent); }
-  .page-btn.active { background: var(--blue-accent); color: white; border-color: var(--blue-accent); font-weight: 600; }
+  .page-btn.active { background: var(--blue-accent-strong); color: white; border-color: var(--blue-accent-strong); font-weight: 600; }
   .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
   select#page-size { padding: 4px 6px; border: 1px solid var(--border-strong); border-radius: 5px; font-size: 12px; }
 
@@ -265,7 +267,7 @@
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   #modal-footer { padding: 12px 20px; border-top: 1px solid var(--gray-border); display: flex; justify-content: flex-end; gap: 8px; }
   .btn-modal-cancel { background: var(--gray-light); color: var(--text-dark); }
-  .btn-modal-save { background: var(--blue-accent); color: white; }
+  .btn-modal-save { background: var(--blue-accent-strong); color: white; }
 
   /* Import modal */
   #import-modal-overlay {
