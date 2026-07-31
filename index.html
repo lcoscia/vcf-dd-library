@@ -7,12 +7,76 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" crossorigin="anonymous"></script>
 
 <style>
+  /* ── CSS DESIGN SYSTEM (ported from VCF-net-planner) ───────────────────────────── */
+  :root {
+    /* ITQ brand tokens */
+    --itq-royal: #040559;
+    --itq-royal-2: #0a0c7a;
+    --itq-orange: #FF4F41;
+    --itq-orange-hover: #e8392b;
+    --itq-light-blue: #CDE3F7;
+    --itq-gold: #F3BA16;
+    --itq-gray: #53565A;
+    --itq-success: #23800A;
+
+    /* Semantic aliases */
+    --blue-dark:   var(--itq-royal);
+    --blue-mid:    var(--itq-royal-2);
+    --blue-accent: var(--itq-orange);
+    --blue-light:  var(--itq-light-blue);
+    --green:  var(--itq-success);
+    --orange: var(--itq-gold);
+    --red:    #c0392b;   /* danger — kept distinct from the --blue-accent CTA orange */
+    --gray-light:  #F7F8F9;
+    --gray-border: #E4E6EA;
+    --text-dark:  #1B1D2A;
+    --text-muted: var(--itq-gray);
+    --surface: #ffffff;
+
+    /* VCF-DD local tokens — NOT part of the shared VCF-net-planner ITQ token set */
+    --hlr-accent: #6c5ce7;       /* HLR/Blueprint purple accent, kept distinct from --blue-accent */
+    --hlr-accent-soft: #a090f0;
+    --surface-2: #f7f8fa;        /* secondary light surface (table headers, hover) */
+    --border-strong: #d0d5dd;
+    --badge-success-bg: #DFF3D8; --badge-success-text: #155724;
+    --badge-info-bg: #CDE3F7;    --badge-info-text: #0a3d66;
+    --badge-warning-bg: #FCEFC7; --badge-warning-text: #7a5c00;
+    --badge-neutral-bg: #E4E6EA; --badge-neutral-text: #495057;
+    --badge-rec-bg: #e2d9f3;     --badge-rec-text: #4a1d96;
+    --badge-excel-bg: #cce5ff;   --badge-excel-text: #004085;
+  }
+  body.dark {
+    --gray-light: #191A30;
+    --gray-border: #33355A;
+    --text-dark: #F2F3F7;
+    --text-muted: #B6B8C8;
+    --surface: #24263F;
+    --blue-accent: #FF6F63;
+
+    --surface-2: #1e1e38;
+    --border-strong: #33355A;
+    --badge-success-bg: #1a3d25; --badge-success-text: #6fcf97;
+    --badge-info-bg: #0d2a4a;    --badge-info-text: #56b4f5;
+    --badge-warning-bg: #3a2d00; --badge-warning-text: #f0c040;
+    --badge-neutral-bg: #252545; --badge-neutral-text: #c0c0e0;
+    --badge-rec-bg: #3a2d5c;     --badge-rec-text: #c9b6f0;
+    --badge-excel-bg: #0d2a4a;   --badge-excel-text: #56b4f5;
+  }
+  @font-face { font-family: 'Metropolis'; src: url('./assets/fonts/Metropolis-ExtraLight.ttf') format('truetype'); font-weight: 200; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Metropolis'; src: url('./assets/fonts/Metropolis-Light.ttf') format('truetype'); font-weight: 300; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Metropolis'; src: url('./assets/fonts/Metropolis-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Metropolis'; src: url('./assets/fonts/Metropolis-Medium.ttf') format('truetype'); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Metropolis'; src: url('./assets/fonts/Metropolis-SemiBold.ttf') format('truetype'); font-weight: 600; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Titillium'; src: url('./assets/fonts/Titillium-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Titillium'; src: url('./assets/fonts/Titillium-Semibold.otf') format('opentype'); font-weight: 600; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Titillium'; src: url('./assets/fonts/Titillium-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; font-display: swap; }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Arial, sans-serif; font-size: 13px; color: #1a1a2e; background: #f0f2f5; height: 100vh; display: flex; flex-direction: column; }
+  body { font-family: 'Metropolis', Arial, sans-serif; font-size: 13px; color: var(--text-dark); background: var(--gray-light); height: 100vh; display: flex; flex-direction: column; }
 
   /* Header */
   #header {
-    background: #1a1a2e;
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue-mid));
     color: white;
     padding: 0 20px;
     height: 52px;
@@ -24,9 +88,9 @@
   }
   #header .logo { display: flex; align-items: center; gap: 10px; }
   #header .logo svg { width: 28px; height: 28px; }
-  #header h1 { font-size: 16px; font-weight: 600; letter-spacing: 0.3px; }
+  #header h1 { font-family: 'Titillium', Arial, sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 0.3px; }
   #header .spacer { flex: 1; }
-  #header .badge { background: rgba(255,255,255,0.12); padding: 3px 10px; border-radius: 20px; font-size: 11px; color: #aab; }
+  #header .badge { background: rgba(255,255,255,0.12); padding: 3px 10px; border-radius: 20px; font-size: 11px; color: rgba(255,255,255,0.65); }
   #version-select {
     background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.25);
     border-radius: 5px; padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer;
@@ -36,17 +100,17 @@
     padding-right: 24px; transition: background 0.15s;
   }
   #version-select:hover { background-color: rgba(255,255,255,0.22); }
-  #version-select option { background: #1a1a2e; color: white; }
+  #version-select option { background: var(--blue-dark); color: white; }
   .btn {
-    padding: 7px 14px; border-radius: 5px; border: none; cursor: pointer;
+    padding: 7px 14px; border-radius: 6px; border: none; cursor: pointer;
     font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;
     transition: all 0.15s;
   }
   .btn:hover { filter: brightness(1.1); }
-  .btn-primary { background: #0074d9; color: white; }
-  .btn-success { background: #27ae60; color: white; }
-  .btn-warning { background: #e67e22; color: white; }
-  .btn-danger { background: #e74c3c; color: white; }
+  .btn-primary { background: var(--blue-accent); color: white; }
+  .btn-success { background: var(--green); color: white; }
+  .btn-warning { background: var(--orange); color: white; }
+  .btn-danger { background: var(--red); color: white; }
   .btn-secondary { background: rgba(255,255,255,0.15); color: white; }
   .btn:disabled { opacity: 0.45; cursor: not-allowed; filter: none; }
 
@@ -57,31 +121,31 @@
   #sidebar {
     width: 240px;
     flex-shrink: 0;
-    background: white;
-    border-right: 1px solid #e0e4ea;
+    background: var(--surface);
+    border-right: 1px solid var(--gray-border);
     overflow-y: auto;
     padding: 12px;
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
-  .filter-group label { font-size: 11px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 5px; }
+  .filter-group label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 5px; }
   .filter-group select, .filter-group input[type=text] {
     width: 100%;
     padding: 6px 8px;
-    border: 1px solid #d0d5dd;
-    border-radius: 4px;
+    border: 1px solid var(--border-strong);
+    border-radius: 5px;
     font-size: 12px;
-    color: #1a1a2e;
-    background: white;
+    color: var(--text-dark);
+    background: var(--surface);
   }
-  .filter-group select:focus, .filter-group input:focus { outline: none; border-color: #0074d9; }
-  #search-box { width: 100%; padding: 7px 8px 7px 28px; border: 1px solid #d0d5dd; border-radius: 4px; font-size: 12px; }
-  #search-box:focus { outline: none; border-color: #0074d9; }
+  .filter-group select:focus, .filter-group input:focus { outline: none; border-color: var(--blue-accent); }
+  #search-box { width: 100%; padding: 7px 8px 7px 28px; border: 1px solid var(--border-strong); border-radius: 5px; font-size: 12px; }
+  #search-box:focus { outline: none; border-color: var(--blue-accent); }
   .search-wrap { position: relative; }
-  .search-wrap svg { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: #999; pointer-events: none; }
-  #results-count { font-size: 11px; color: #888; padding: 4px 2px; }
-  .filter-sep { border: none; border-top: 1px solid #eee; margin: 0; }
+  .search-wrap svg { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+  #results-count { font-size: 11px; color: var(--text-muted); padding: 4px 2px; }
+  .filter-sep { border: none; border-top: 1px solid var(--gray-border); margin: 0; }
 
   /* Content */
   #content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -89,27 +153,27 @@
   /* Toolbar */
   #toolbar {
     padding: 8px 16px;
-    background: white;
-    border-bottom: 1px solid #e0e4ea;
+    background: var(--surface);
+    border-bottom: 1px solid var(--gray-border);
     display: flex;
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
   }
-  #toolbar .sep { width: 1px; height: 20px; background: #e0e4ea; }
-  #selection-info { font-size: 12px; color: #555; }
+  #toolbar .sep { width: 1px; height: 20px; background: var(--gray-border); }
+  #selection-info { font-size: 12px; color: var(--text-muted); }
 
   /* Table area */
   #table-wrap { flex: 1; overflow: auto; }
   table { border-collapse: collapse; font-size: 12px; table-layout: fixed; width: 100%; min-width: 900px; }
   thead th {
     position: sticky; top: 0; z-index: 10;
-    background: #f7f8fa; border-bottom: 2px solid #d0d5dd;
+    background: var(--surface-2); border-bottom: 2px solid var(--border-strong);
     padding: 8px 24px 8px 10px; text-align: left; font-weight: 700;
-    color: #444; white-space: nowrap; user-select: none; cursor: pointer;
+    color: var(--text-dark); white-space: nowrap; user-select: none; cursor: pointer;
     overflow: hidden; position: sticky;
   }
-  thead th:hover { background: #eef0f4; }
+  thead th:hover { background: var(--gray-border); }
   thead th.sort-asc::after { content: ' ▲'; font-size: 9px; }
   thead th.sort-desc::after { content: ' ▼'; font-size: 9px; }
   thead th.no-sort { cursor: default; }
@@ -119,59 +183,59 @@
     width: 5px; cursor: col-resize; z-index: 1;
     background: transparent;
   }
-  .col-resize-handle:hover, .col-resize-handle.dragging { background: #0074d9; opacity: 0.5; }
+  .col-resize-handle:hover, .col-resize-handle.dragging { background: var(--blue-accent); opacity: 0.5; }
 
   /* Collapsed columns */
   thead th.col-hidden {
     width: 8px !important; min-width: 8px !important;
     padding: 0 !important; overflow: hidden;
-    background: #dce3f0 !important;
+    background: var(--border-strong) !important;
   }
-  thead th.col-hidden .col-resize-handle { width: 8px; background: rgba(0,116,217,0.3); opacity: 1; }
+  thead th.col-hidden .col-resize-handle { width: 8px; background: color-mix(in srgb, var(--blue-accent) 30%, transparent); opacity: 1; }
   tbody td.col-hidden { padding: 0 !important; overflow: hidden; }
-  body.dark thead th.col-hidden { background: #252550 !important; }
-  body.dark thead th.col-hidden .col-resize-handle { background: rgba(85,153,255,0.3); }
+  body.dark thead th.col-hidden { background: var(--surface-2) !important; }
+  body.dark thead th.col-hidden .col-resize-handle { background: color-mix(in srgb, var(--blue-accent) 30%, transparent); }
   thead th { position: sticky; top: 0; }
-  tbody tr { border-bottom: 1px solid #e8ecf0; transition: background 0.1s; }
-  tbody tr:hover { background: #f0f7ff; }
-  tbody tr.selected { background: #dbeeff; }
+  tbody tr { border-bottom: 1px solid var(--gray-border); transition: background 0.1s; }
+  tbody tr:hover { background: color-mix(in srgb, var(--blue-mid) 8%, var(--surface)); }
+  tbody tr.selected { background: color-mix(in srgb, var(--blue-mid) 16%, var(--surface)); }
   tbody td { padding: 7px 10px; vertical-align: top; overflow: hidden; }
-  tbody td.id-cell { font-family: monospace; font-size: 11px; color: #0056a3; white-space: nowrap; font-weight: 600; }
+  tbody td.id-cell { font-family: monospace; font-size: 11px; color: var(--blue-mid); white-space: nowrap; font-weight: 600; }
   tbody td.id-cell .id-link { cursor: pointer; text-decoration: none; }
-  tbody td.id-cell .id-link:hover { text-decoration: underline; color: #003d7a; }
+  tbody td.id-cell .id-link:hover { text-decoration: underline; color: color-mix(in srgb, var(--blue-mid) 85%, black); }
   body.dark tbody td.id-cell .id-link:hover { color: #88bbff; }
   .cell-content { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
   .cell-content.expanded { white-space: pre-wrap; word-break: break-word; overflow: visible; text-overflow: clip; }
   tbody td.cell-expanded { overflow: visible; cursor: zoom-out; }
   tbody td:has(.cell-content):not(.cell-expanded) { cursor: zoom-in; }
   .text-preview { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 240px; }
-  .expand-btn { background: none; border: none; color: #0074d9; cursor: pointer; font-size: 10px; padding: 0; margin-left: 4px; }
-  .badge-compliant { background: #d4edda; color: #155724; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
-  .badge-norisk { background: #d1ecf1; color: #0c5460; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
-  .badge-req { background: #fff3cd; color: #856404; padding: 2px 7px; border-radius: 10px; font-size: 10px; white-space: nowrap; }
-  .badge-rec { background: #e2d9f3; color: #4a1d96; padding: 2px 7px; border-radius: 10px; font-size: 10px; white-space: nowrap; }
-  .badge-other { background: #e9ecef; color: #495057; padding: 2px 7px; border-radius: 10px; font-size: 10px; white-space: nowrap; }
-  .subsection-tag { font-size: 10px; color: #888; display: block; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+  .expand-btn { background: none; border: none; color: var(--blue-accent); cursor: pointer; font-size: 10px; padding: 0; margin-left: 4px; }
+  .badge-compliant { background: var(--badge-success-bg); color: var(--badge-success-text); padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+  .badge-norisk { background: var(--badge-info-bg); color: var(--badge-info-text); padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+  .badge-req { background: var(--badge-warning-bg); color: var(--badge-warning-text); padding: 2px 7px; border-radius: 10px; font-size: 10px; white-space: nowrap; }
+  .badge-rec { background: var(--badge-rec-bg); color: var(--badge-rec-text); padding: 2px 7px; border-radius: 10px; font-size: 10px; white-space: nowrap; }
+  .badge-other { background: var(--badge-neutral-bg); color: var(--badge-neutral-text); padding: 2px 7px; border-radius: 10px; font-size: 10px; white-space: nowrap; }
+  .subsection-tag { font-size: 10px; color: var(--text-muted); display: block; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
 
   /* Source badges */
-  .badge-both   { background: #d4edda; color: #155724; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
-  .badge-excel  { background: #cce5ff; color: #004085; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
-  .badge-webdoc { background: #fff3cd; color: #856404; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+  .badge-both   { background: var(--badge-success-bg); color: var(--badge-success-text); padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+  .badge-excel  { background: var(--badge-excel-bg); color: var(--badge-excel-text); padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+  .badge-webdoc { background: var(--badge-warning-bg); color: var(--badge-warning-text); padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
 
   /* Pagination */
   #pagination {
     display: flex; align-items: center; gap: 6px; padding: 8px 16px;
-    border-top: 1px solid #e0e4ea; background: white; flex-shrink: 0;
+    border-top: 1px solid var(--gray-border); background: var(--surface); flex-shrink: 0;
   }
-  #pagination .page-info { flex: 1; font-size: 11px; color: #666; }
+  #pagination .page-info { flex: 1; font-size: 11px; color: var(--text-muted); }
   .page-btn {
-    padding: 4px 10px; border: 1px solid #d0d5dd; background: white;
-    border-radius: 4px; cursor: pointer; font-size: 12px; color: #444;
+    padding: 4px 10px; border: 1px solid var(--border-strong); background: var(--surface);
+    border-radius: 5px; cursor: pointer; font-size: 12px; color: var(--text-dark);
   }
-  .page-btn:hover { background: #f0f7ff; border-color: #0074d9; }
-  .page-btn.active { background: #0074d9; color: white; border-color: #0074d9; font-weight: 600; }
+  .page-btn:hover { background: color-mix(in srgb, var(--blue-mid) 8%, var(--surface)); border-color: var(--blue-accent); }
+  .page-btn.active { background: var(--blue-accent); color: white; border-color: var(--blue-accent); font-weight: 600; }
   .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  select#page-size { padding: 4px 6px; border: 1px solid #d0d5dd; border-radius: 4px; font-size: 12px; }
+  select#page-size { padding: 4px 6px; border: 1px solid var(--border-strong); border-radius: 5px; font-size: 12px; }
 
   /* Modal */
   #modal-overlay {
@@ -180,28 +244,28 @@
   }
   #modal-overlay.open { display: flex; }
   #modal {
-    background: white; border-radius: 8px; width: 760px; max-width: 95vw;
+    background: var(--surface); border-radius: 12px; width: 760px; max-width: 95vw;
     max-height: 90vh; display: flex; flex-direction: column;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    box-shadow: 0 24px 64px rgba(0,0,0,0.4);
   }
   #modal-header {
-    padding: 16px 20px; border-bottom: 1px solid #eee;
+    padding: 16px 20px; border-bottom: 1px solid var(--gray-border);
     display: flex; align-items: center; gap: 10px;
   }
-  #modal-header h2 { font-size: 15px; font-weight: 700; flex: 1; }
-  #modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #666; padding: 0 4px; }
+  #modal-header h2 { font-family: 'Titillium', Arial, sans-serif; font-size: 15px; font-weight: 700; flex: 1; }
+  #modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 0 4px; }
   #modal-body { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
-  .field-group label { font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.4px; display: block; margin-bottom: 4px; }
+  .field-group label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; display: block; margin-bottom: 4px; }
   .field-group input, .field-group textarea, .field-group select {
-    width: 100%; padding: 7px 10px; border: 1px solid #d0d5dd;
-    border-radius: 4px; font-size: 13px; font-family: Arial, sans-serif;
+    width: 100%; padding: 7px 10px; border: 1px solid var(--border-strong);
+    border-radius: 5px; font-size: 13px; font-family: 'Metropolis', Arial, sans-serif;
   }
   .field-group textarea { resize: vertical; min-height: 80px; }
-  .field-group input:focus, .field-group textarea:focus, .field-group select:focus { outline: none; border-color: #0074d9; }
+  .field-group input:focus, .field-group textarea:focus, .field-group select:focus { outline: none; border-color: var(--blue-accent); }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  #modal-footer { padding: 12px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 8px; }
-  .btn-modal-cancel { background: #f0f0f0; color: #333; }
-  .btn-modal-save { background: #0074d9; color: white; }
+  #modal-footer { padding: 12px 20px; border-top: 1px solid var(--gray-border); display: flex; justify-content: flex-end; gap: 8px; }
+  .btn-modal-cancel { background: var(--gray-light); color: var(--text-dark); }
+  .btn-modal-save { background: var(--blue-accent); color: white; }
 
   /* Import modal */
   #import-modal-overlay {
@@ -210,25 +274,25 @@
   }
   #import-modal-overlay.open { display: flex; }
   #import-modal {
-    background: white; border-radius: 8px; width: 480px;
-    padding: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    background: var(--surface); border-radius: 12px; width: 480px;
+    padding: 24px; box-shadow: 0 24px 64px rgba(0,0,0,0.4);
   }
-  #import-modal h2 { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+  #import-modal h2 { font-family: 'Titillium', Arial, sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 12px; }
   #drop-zone {
-    border: 2px dashed #c0c8d8; border-radius: 6px; padding: 32px;
-    text-align: center; color: #777; margin: 12px 0; cursor: pointer;
+    border: 2px dashed var(--border-strong); border-radius: 6px; padding: 32px;
+    text-align: center; color: var(--text-muted); margin: 12px 0; cursor: pointer;
     transition: all 0.2s;
   }
-  #drop-zone.dragover { border-color: #0074d9; background: #f0f7ff; color: #0074d9; }
+  #drop-zone.dragover { border-color: var(--blue-accent); background: color-mix(in srgb, var(--blue-mid) 8%, var(--surface)); color: var(--blue-accent); }
   #drop-zone p { font-size: 13px; }
-  #drop-zone small { font-size: 11px; color: #aaa; }
+  #drop-zone small { font-size: 11px; color: var(--text-muted); }
   #import-file { display: none; }
-  #import-status { font-size: 12px; color: #888; margin-top: 8px; min-height: 18px; }
+  #import-status { font-size: 12px; color: var(--text-muted); margin-top: 8px; min-height: 18px; }
   #import-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
 
   /* Toast */
   #toast {
-    position: fixed; bottom: 20px; right: 20px; background: #1a1a2e;
+    position: fixed; bottom: 20px; right: 20px; background: var(--blue-dark);
     color: white; padding: 10px 18px; border-radius: 6px; font-size: 13px;
     z-index: 9999; opacity: 0; transform: translateY(10px);
     transition: all 0.3s; pointer-events: none;
@@ -236,7 +300,7 @@
   #toast.show { opacity: 1; transform: translateY(0); }
 
   /* Empty state */
-  #empty-state { text-align: center; padding: 60px 20px; color: #999; }
+  #empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
   #empty-state svg { margin-bottom: 12px; opacity: 0.4; }
   #empty-state p { font-size: 14px; }
 
@@ -245,12 +309,12 @@
 
   /* Group header row */
   tr.group-header td {
-    background: #e8edf5; font-weight: 700; font-size: 11px;
-    color: #2c3e6b; padding: 5px 10px; cursor: pointer;
-    letter-spacing: 0.3px; border-bottom: 1px solid #c8d0e0;
+    background: color-mix(in srgb, var(--blue-mid) 12%, var(--surface)); font-weight: 700; font-size: 11px;
+    color: var(--blue-mid); padding: 5px 10px; cursor: pointer;
+    letter-spacing: 0.3px; border-bottom: 1px solid var(--border-strong);
     white-space: nowrap; text-transform: uppercase;
   }
-  tr.group-header:hover td { background: #dce3f0; }
+  tr.group-header:hover td { background: color-mix(in srgb, var(--blue-mid) 20%, var(--surface)); }
   tr.group-header .group-toggle { margin-right: 6px; font-size: 10px; display: inline-block; width: 12px; }
   tr.group-collapsed { display: none; }
 
@@ -262,87 +326,54 @@
   thead th.mark-th { width: 28px; min-width: 28px; text-align: center; padding: 4px 2px; cursor: default; }
 
   /* Temp DD indicator */
-  tr.temp-row td { background: #fffbf0; }
-  tr.temp-row:hover td { background: #fff3d0; }
-  .temp-badge { background: #ffc107; color: #664; font-size: 9px; padding: 1px 5px; border-radius: 8px; font-weight: 700; margin-left: 4px; vertical-align: middle; }
+  tr.temp-row td { background: color-mix(in srgb, var(--orange) 10%, var(--surface)); }
+  tr.temp-row:hover td { background: color-mix(in srgb, var(--orange) 20%, var(--surface)); }
+  .temp-badge { background: var(--orange); color: #664; font-size: 9px; padding: 1px 5px; border-radius: 8px; font-weight: 700; margin-left: 4px; vertical-align: middle; }
 
   /* Stats panel */
-  #stats-panel { border-top: 1px solid #eee; padding-top: 10px; }
-  #stats-panel .stats-title { font-size: 11px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
-  .stats-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px solid #f3f3f3; }
+  #stats-panel { border-top: 1px solid var(--gray-border); padding-top: 10px; }
+  #stats-panel .stats-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+  .stats-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--gray-border); }
   .stats-row:last-child { border-bottom: none; }
-  .stats-comp { font-size: 11px; color: #444; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 155px; }
-  .stats-count { font-size: 11px; font-weight: 700; color: #0074d9; background: #e8f3ff; padding: 1px 7px; border-radius: 10px; flex-shrink: 0; }
-  #stats-total { font-size: 12px; font-weight: 700; color: #27ae60; margin-bottom: 6px; }
+  .stats-comp { font-size: 11px; color: var(--text-dark); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 155px; }
+  .stats-count { font-size: 11px; font-weight: 700; color: var(--blue-accent); background: color-mix(in srgb, var(--blue-accent) 12%, var(--surface)); padding: 1px 7px; border-radius: 10px; flex-shrink: 0; }
+  #stats-total { font-size: 12px; font-weight: 700; color: var(--green); margin-bottom: 6px; }
 
   /* Toggle button */
-  .btn-toggle { background: #f0f0f0; color: #555; }
-  .btn-toggle.active { background: #0056a3; color: white; }
+  .btn-toggle { background: var(--gray-light); color: var(--text-muted); }
+  .btn-toggle.active { background: var(--blue-mid); color: white; }
 
   /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: #f0f2f5; }
-  ::-webkit-scrollbar-thumb { background: #c0c8d8; border-radius: 3px; }
+  ::-webkit-scrollbar-track { background: var(--gray-light); }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
 
-  /* ── DARK THEME ── */
-  body.dark { background: #0d0d1a; color: #d0d0e8; }
-  body.dark #sidebar { background: #141428; border-color: #252545; }
-  body.dark #toolbar { background: #141428; border-color: #252545; }
-  body.dark #pagination { background: #141428; border-color: #252545; }
-  body.dark .filter-group select,
-  body.dark .filter-group input[type=text],
-  body.dark #search-box { background: #1e1e38; color: #d0d0e8; border-color: #303060; }
-  body.dark .filter-sep { border-color: #252545; }
-  body.dark .filter-group label { color: #9090b0; }
-  body.dark #results-count { color: #7070a0; }
-  body.dark table { background: #141428; }
-  body.dark thead th { background: #1e1e38; color: #c0c0e0; border-color: #303060; }
-  body.dark thead th:hover { background: #252550; }
-  body.dark tbody tr { border-color: #252545; }
-  body.dark tbody tr:hover { background: #1a1a40; }
-  body.dark tbody tr.selected { background: #1a2a50; }
-  body.dark tbody td { color: #c0c0e0; }
-  body.dark tbody td.id-cell { color: #5599ff; }
-  body.dark tr.group-header td { background: #1e2248; color: #9090cc; border-color: #303060; }
+  /* ── DARK THEME ──
+     Most base colors below now flow automatically from the token contract
+     (body.dark{} at the top overrides --surface/--gray-light/--gray-border/
+     --text-dark/--text-muted/--border-strong/--blue-accent/badge-* etc, and every
+     selector above already reads var(...) for those properties). Only the rules
+     below that set colors NOT covered by a flipping token remain as explicit
+     overrides. */
+  body.dark tbody td.id-cell { color: #5599ff; } /* --blue-mid doesn't flip; needs a brighter readable blue on dark bg */
+  body.dark tr.group-header td { background: #1e2248; color: #9090cc; border-color: var(--border-strong); } /* bespoke navy tint, --blue-mid text would be unreadable on dark bg */
   body.dark tr.group-header:hover td { background: #25295a; }
-  body.dark tr.temp-row td { background: #28210a; }
+  body.dark tr.temp-row td { background: #28210a; } /* bespoke warm-dark tint, --orange doesn't flip */
   body.dark tr.temp-row:hover td { background: #332900; }
-  body.dark #modal, body.dark #import-modal { background: #1a1a2e; color: #d0d0e8; }
-  body.dark #modal-header, body.dark #modal-footer { border-color: #303060; }
-  body.dark #modal-body { background: #1a1a2e; }
-  body.dark .field-group label { color: #9090b0; }
   body.dark .field-group input,
   body.dark .field-group textarea,
-  body.dark .field-group select { background: #141428; color: #d0d0e8; border-color: #303060; }
-  body.dark .field-group input[readonly] { background: #0d0d1a; color: #7070a0; }
-  body.dark .btn-modal-cancel { background: #252545; color: #c0c0e0; }
-  body.dark #drop-zone { border-color: #303060; color: #7070a0; }
-  body.dark #drop-zone.dragover { background: #1a1a40; }
-  body.dark .btn-toggle { background: #252545; color: #c0c0e0; }
-  body.dark .btn-toggle.active { background: #0056a3; color: white; }
-  body.dark .page-btn { background: #1e1e38; color: #c0c0e0; border-color: #303060; }
-  body.dark .page-btn:hover { background: #252550; border-color: #5599ff; }
-  body.dark .page-btn.active { background: #0074d9; }
-  body.dark select#page-size { background: #1e1e38; color: #c0c0e0; border-color: #303060; }
-  body.dark #stats-panel { border-color: #252545; }
-  body.dark .stats-comp { color: #a0a0c0; }
-  body.dark .stats-row { border-color: #1e1e38; }
-  body.dark #empty-state { color: #505080; }
-  body.dark #toast { background: #252545; }
-  body.dark [style*="background:#f0f0f0"] { background: #252545 !important; color: #c0c0e0 !important; }
-  body.dark [style*="background:#eef0f4"] { background: #1e1e38 !important; color: #9090b0 !important; }
-  body.dark .search-wrap svg { color: #606080; }
-  body.dark .badge-both   { background: #1a3d25; color: #6fcf97; }
-  body.dark .badge-excel  { background: #0d2a4a; color: #56b4f5; }
-  body.dark .badge-webdoc { background: #3a2d00; color: #f0c040; }
+  body.dark .field-group select { background: var(--gray-light); color: var(--text-dark); border-color: var(--border-strong); } /* no light-mode background to flip from */
+  body.dark .field-group input[readonly] { background: var(--surface); color: var(--text-muted); }
+  body.dark select#page-size { background: var(--surface-2); color: var(--text-dark); } /* no light-mode background to flip from */
+  body.dark .stats-comp { color: var(--text-muted); } /* deliberately more muted than --text-dark in dark mode */
 
   /* Footer */
   #footer {
     position: fixed; bottom: 8px; left: 14px;
-    font-size: 10px; color: #aaa; pointer-events: none; z-index: 50;
+    font-size: 10px; color: var(--text-muted); pointer-events: none; z-index: 50;
     display: flex; align-items: center; gap: 5px;
   }
-  body.dark #footer { color: #505070; }
+  body.dark #footer { color: #505070; } /* deliberately low-contrast watermark, darker than --text-muted's dark value */
   #footer svg { width: 11px; height: 11px; opacity: 0.7; }
 
   /* Hamburger (mobile) */
@@ -385,48 +416,78 @@
   }
 
   /* ── VIEW MODE TABS ── */
-  #view-tabs { display:flex; background:#1a1a2e; padding:0 16px; flex-shrink:0; gap:2px; }
+  #view-tabs { display:flex; background:var(--blue-dark); padding:0 16px; flex-shrink:0; gap:2px; }
   .view-tab {
     padding:8px 18px; font-size:12px; font-weight:700; cursor:pointer; border:none;
     background:transparent; color:rgba(255,255,255,0.5); border-bottom:3px solid transparent;
     transition:all 0.15s; letter-spacing:0.2px;
   }
   .view-tab:hover { color:rgba(255,255,255,0.85); }
-  .view-tab.active { color:white; border-bottom-color:#6c5ce7; }
-  body.dark #view-tabs { background:#0f0f1e; }
+  .view-tab.active { color:white; border-bottom-color:var(--hlr-accent); }
+  body.dark #view-tabs { background:color-mix(in srgb, var(--blue-dark) 85%, black); }
 
   /* ── HLR PANEL ── */
-  #blueprint-select { padding:6px 12px; border:1px solid #a89de0; border-radius:5px; font-size:12px; font-weight:600; color:#1a1a2e; min-width:340px; background:white; }
-  #blueprint-select:focus { outline:none; border-color:#6c5ce7; }
-  #hlr-panel { background:#f8f6ff; border-bottom:1px solid #d0c8f0; padding:10px 16px; font-size:12px; flex-shrink:0; }
-  #hlr-panel .hlr-title { font-size:11px; font-weight:700; text-transform:uppercase; color:#6c5ce7; letter-spacing:0.5px; margin-bottom:6px; }
-  #hlr-panel ul { padding-left:16px; display:flex; flex-direction:column; gap:3px; color:#444; }
+  #blueprint-select { padding:6px 12px; border:1px solid var(--hlr-accent-soft); border-radius:5px; font-size:12px; font-weight:600; color:var(--text-dark); min-width:340px; background:var(--surface); }
+  #blueprint-select:focus { outline:none; border-color:var(--hlr-accent); }
+  #hlr-panel { background:color-mix(in srgb, var(--hlr-accent) 6%, var(--surface)); border-bottom:1px solid color-mix(in srgb, var(--hlr-accent) 18%, var(--surface)); padding:10px 16px; font-size:12px; flex-shrink:0; }
+  #hlr-panel .hlr-title { font-size:11px; font-weight:700; text-transform:uppercase; color:var(--hlr-accent); letter-spacing:0.5px; margin-bottom:6px; }
+  #hlr-panel ul { padding-left:16px; display:flex; flex-direction:column; gap:3px; color:var(--text-dark); }
   /* ── DARK MODE new elements ── */
 
-  .hlr-tab { background:rgba(108,92,231,0.1); border:1px solid rgba(108,92,231,0.25); color:#6c5ce7; border-radius:4px; padding:3px 10px; font-size:11px; font-weight:600; cursor:pointer; transition:all 0.15s; }
-  .hlr-tab:hover { background:rgba(108,92,231,0.2); }
-  .hlr-tab.active { background:#6c5ce7; color:white; border-color:#6c5ce7; }
-  #hlr-tab-content { font-size:12px; color:#444; }
+  .hlr-tab { background:color-mix(in srgb, var(--hlr-accent) 10%, transparent); border:1px solid color-mix(in srgb, var(--hlr-accent) 25%, transparent); color:var(--hlr-accent); border-radius:5px; padding:3px 10px; font-size:11px; font-weight:600; cursor:pointer; transition:all 0.15s; }
+  .hlr-tab:hover { background:color-mix(in srgb, var(--hlr-accent) 20%, transparent); }
+  .hlr-tab.active { background:var(--hlr-accent); color:white; border-color:var(--hlr-accent); }
+  #hlr-tab-content { font-size:12px; color:var(--text-dark); }
   .hlr-table { width:100%; border-collapse:collapse; font-size:11px; margin-top:2px; }
   .hlr-resizable { border-collapse:separate; border-spacing:0; }
   .hlr-resizable th { position:relative; overflow:visible; }
   .hlr-resize-handle { position:absolute; right:0; top:0; bottom:0; width:5px; cursor:col-resize; background:transparent; z-index:2; }
-  .hlr-resize-handle:hover, .hlr-resize-handle.dragging { background:rgba(108,92,231,0.5); }
-  .hlr-table th { background:rgba(108,92,231,0.12); padding:4px 10px; text-align:left; font-weight:700; color:#5a4db0; border-bottom:1px solid rgba(108,92,231,0.2); white-space:nowrap; }
-  .hlr-table td { padding:4px 10px; border-bottom:1px solid rgba(108,92,231,0.08); vertical-align:top; }
+  .hlr-resize-handle:hover, .hlr-resize-handle.dragging { background:color-mix(in srgb, var(--hlr-accent) 50%, transparent); }
+  .hlr-table th { background:color-mix(in srgb, var(--hlr-accent) 12%, transparent); padding:4px 10px; text-align:left; font-weight:700; color:var(--hlr-accent); border-bottom:1px solid color-mix(in srgb, var(--hlr-accent) 20%, transparent); white-space:nowrap; }
+  .hlr-table td { padding:4px 10px; border-bottom:1px solid color-mix(in srgb, var(--hlr-accent) 8%, transparent); vertical-align:top; }
   .hlr-table tr:last-child td { border-bottom:none; }
-  .hlr-badge { display:inline-block; background:rgba(108,92,231,0.12); color:#5a4db0; border-radius:3px; padding:1px 6px; font-size:10px; font-weight:600; font-family:monospace; }
-  body.dark .hlr-tab { background:rgba(108,92,231,0.15); border-color:rgba(108,92,231,0.35); color:#a090f0; }
-  body.dark .hlr-tab.active { background:#6c5ce7; color:white; }
-  body.dark #hlr-tab-content { color:#c0c0e0; }
-  body.dark .hlr-table th { background:rgba(108,92,231,0.2); color:#a090f0; border-color:rgba(108,92,231,0.3); }
-  body.dark .hlr-table td { border-color:rgba(108,92,231,0.1); }
-  body.dark .hlr-badge { background:rgba(108,92,231,0.2); color:#a090f0; }
+  .hlr-badge { display:inline-block; background:color-mix(in srgb, var(--hlr-accent) 12%, transparent); color:var(--hlr-accent); border-radius:3px; padding:1px 6px; font-size:10px; font-weight:600; font-family:monospace; }
+  body.dark .hlr-tab { background:color-mix(in srgb, var(--hlr-accent) 15%, transparent); border-color:color-mix(in srgb, var(--hlr-accent) 35%, transparent); color:var(--hlr-accent-soft); }
+  body.dark .hlr-tab.active { background:var(--hlr-accent); color:white; }
+  body.dark .hlr-table th { background:color-mix(in srgb, var(--hlr-accent) 20%, transparent); color:var(--hlr-accent-soft); border-color:color-mix(in srgb, var(--hlr-accent) 30%, transparent); }
+  body.dark .hlr-table td { border-color:color-mix(in srgb, var(--hlr-accent) 10%, transparent); }
+  body.dark .hlr-badge { background:color-mix(in srgb, var(--hlr-accent) 20%, transparent); color:var(--hlr-accent-soft); }
 
-  body.dark #hlr-panel { background:#17103a; border-color:#303060; color:#c0c0e0; }
-  body.dark #hlr-panel ul { color:#a0a0c8; }
-  body.dark #blueprint-select { background:#1e1e38; color:#d0d0e8; border-color:#303060; }
+  /* === inline-style sweep classes === */
+  .iw-muted-text { color: var(--text-muted); }
+  .iw-link-danger { background: none; border: none; cursor: pointer; font-size: 10px; color: var(--red); font-weight: 600; }
+  .iw-btn-neutral { background: var(--badge-neutral-bg); color: var(--badge-neutral-text); }
+  .iw-btn-subtle { background: var(--surface-2); color: var(--text-muted); font-size: 11px; justify-content: center; }
+  .iw-btn-hlr { background: var(--hlr-accent); color: #fff; }
+  .iw-hlr-toolbar { display: flex; background: color-mix(in srgb, var(--hlr-accent) 12%, transparent); border-bottom: 2px solid var(--hlr-accent); padding: 10px 16px; align-items: center; gap: 12px; flex-shrink: 0; }
+  .iw-hlr-label { font-size: 11px; font-weight: 700; color: var(--hlr-accent); white-space: nowrap; }
+  .iw-optgroup-hlr { color: var(--hlr-accent); font-weight: 700; font-size: 11px; }
+  .iw-optgroup-info { color: var(--badge-info-text); font-weight: 700; font-size: 11px; }
+  .iw-readonly-input { background: var(--surface-2); color: var(--text-muted); }
+  .iw-modal-overlay { background: rgba(0,0,0,0.5); }
+  .iw-modal-box { background: var(--surface); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .iw-modal-header { border-bottom: 1px solid var(--gray-border); }
+  .iw-modal-footer { border-top: 1px solid var(--gray-border); }
+  .iw-modal-close { background: none; border: none; color: var(--text-muted); }
+  .iw-input-border { border: 1px solid var(--border-strong); }
+  .iw-badge-warning-inline { font-size: 11px; color: var(--badge-warning-text); background: var(--badge-warning-bg); padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  body.dark .iw-btn-neutral { background: var(--badge-neutral-bg); color: var(--badge-neutral-text); }
+  body.dark .iw-btn-subtle { background: var(--surface-2); color: var(--text-muted); }
 
+  /* about modal */
+  .am-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 1000; align-items: center; justify-content: center; }
+  .am-box { background: var(--surface); border-radius: 10px; width: 580px; max-width: 95vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 64px rgba(0,0,0,0.3); font-family: Arial, sans-serif; color: var(--text-dark); }
+  .am-header { background: linear-gradient(135deg, var(--blue-dark), var(--blue-mid)); padding: 28px 28px 20px; border-radius: 10px 10px 0 0; color: #fff; }
+  .am-close-btn { margin-left: auto; background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 18px; cursor: pointer; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
+  .am-section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--blue-mid); margin-bottom: 10px; }
+  .am-feature-card { background: var(--surface-2); border-radius: 6px; padding: 10px 12px; font-size: 12px; }
+  .am-feature-card-highlight { background: var(--badge-rec-bg); border-radius: 6px; padding: 10px 12px; font-size: 12px; border: 1px solid color-mix(in srgb, var(--badge-rec-text) 25%, transparent); }
+  .am-feature-desc { color: var(--text-muted); }
+  .am-changelog-list { font-size: 12px; border-left: 3px solid var(--blue-mid); padding-left: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .am-changelog-title { font-weight: 700; color: var(--text-dark); }
+  .am-changelog-desc { color: var(--text-muted); margin-top: 3px; }
+  .am-note-box { background: var(--badge-warning-bg); border-radius: 6px; padding: 12px 14px; font-size: 11px; color: var(--badge-warning-text); border: 1px solid color-mix(in srgb, var(--badge-warning-text) 30%, transparent); }
+  .am-footer { padding: 14px 28px; border-top: 1px solid var(--gray-border); display: flex; justify-content: flex-end; }
 
 </style>
 
@@ -438,7 +499,7 @@
   <button id="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">☰</button>
   <div class="logo">
     <svg viewBox="0 0 28 28" fill="none">
-      <rect width="28" height="28" rx="6" fill="#0074d9"/>
+      <rect width="28" height="28" rx="6" fill="var(--blue-accent)"/>
       <path d="M7 14h14M7 9h8M7 19h10" stroke="white" stroke-width="2" stroke-linecap="round"/>
     </svg>
     <h1>VCF Design Decision Library</h1>
@@ -472,7 +533,7 @@
     <div class="filter-group">
       <label>Search</label>
       <div class="search-wrap">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="#999" stroke-width="1.5"/><path d="M10.5 10.5l3 3" stroke="#999" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="var(--text-muted)" stroke-width="1.5"/><path d="M10.5 10.5l3 3" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round"/></svg>
         <input type="text" id="search-box" placeholder="Search ID, decision..." oninput="applyFilters()">
       </div>
     </div>
@@ -538,7 +599,7 @@
 
     <hr class="filter-sep">
 
-    <button class="btn btn-secondary" style="background:#eef0f4;color:#555;font-size:11px;justify-content:center;" onclick="resetFilters()">Reset Filters</button>
+    <button class="btn btn-secondary iw-btn-subtle" onclick="resetFilters()">Reset Filters</button>
 
     <div id="results-count"></div>
 
@@ -546,7 +607,7 @@
     <div id="stats-panel" style="display:none;">
       <div class="stats-title">
         <span>⭐ Marked for Export</span>
-        <button onclick="clearAllMarked()" style="background:none;border:none;cursor:pointer;font-size:10px;color:#e74c3c;font-weight:600;">Clear all</button>
+        <button onclick="clearAllMarked()" class="iw-link-danger">Clear all</button>
       </div>
       <div id="stats-total"></div>
       <div id="stats-by-component"></div>
@@ -561,17 +622,17 @@
       <button class="view-tab" id="tab-library" onclick="switchViewMode('library')">📚 Design Library</button>
     </div>
     <!-- Blueprint Toolbar -->
-    <div id="private-toolbar" style="display:flex;background:#f0eeff;border-bottom:2px solid #6c5ce7;padding:10px 16px;align-items:center;gap:12px;flex-shrink:0;">
-      <label style="font-size:11px;font-weight:700;color:#6c5ce7;white-space:nowrap;">Blueprint :</label>
+    <div id="private-toolbar" class="iw-hlr-toolbar">
+      <label class="iw-hlr-label">Blueprint :</label>
       <select id="blueprint-select" onchange="loadBlueprint(this.value)">
-        <optgroup label="── VCF Fleet Topologies (9.0/9.1) ──" style="color:#0074d9;font-weight:700;font-size:11px;">
+        <optgroup label="── VCF Fleet Topologies (9.0/9.1) ──" class="iw-optgroup-info">
           <option value="VCF Fleet in a Single Site">VCF Fleet in a Single Site</option>
           <option value="VCF Fleet in a Single Site with Minimal Footprint">VCF Fleet in a Single Site with Minimal Footprint</option>
           <option value="VCF Fleet with Multiple Sites in a Single Region">VCF Fleet with Multiple Sites in a Single Region</option>
           <option value="VCF Fleet with Multiple Sites in a Single Region plus Additional Region(s)">VCF Fleet with Multiple Sites in a Single Region plus Additional Region(s)</option>
           <option value="VCF Fleet with Multiple Sites Across Multiple Regions">VCF Fleet with Multiple Sites Across Multiple Regions</option>
         </optgroup>
-        <optgroup label="── Infrastructure Modernization (9.1) ──" style="color:#6c5ce7;font-weight:700;font-size:11px;">
+        <optgroup label="── Infrastructure Modernization (9.1) ──" class="iw-optgroup-hlr">
           <option value="VCF Fleet Management Blueprint">VCF Fleet Management Blueprint</option>
           <option value="VCF Monitoring and Alerting Blueprint">VCF Monitoring and Alerting Blueprint</option>
           <option value="VCF Troubleshooting Blueprint">VCF Troubleshooting Blueprint</option>
@@ -579,12 +640,12 @@
           <option value="VCF Edge Blueprint for Government and Defense">VCF Edge Blueprint for Government and Defense</option>
           <option value="VCF Edge Blueprint for Manufacturing Use Case">VCF Edge Blueprint for Manufacturing Use Case</option>
         </optgroup>
-        <optgroup label="── Application Modernization (9.1) ──" style="color:#6c5ce7;font-weight:700;font-size:11px;">
+        <optgroup label="── Application Modernization (9.1) ──" class="iw-optgroup-hlr">
           <option value="Self-Service Multi-Tenant Private Cloud Blueprint">Self-Service Multi-Tenant Private Cloud Blueprint</option>
           <option value="VKS Consumption Blueprint">VKS Consumption Blueprint</option>
           <option value="Private AI Services Blueprint">Private AI Services Blueprint</option>
         </optgroup>
-        <optgroup label="── Security Modernization (9.1) ──" style="color:#6c5ce7;font-weight:700;font-size:11px;">
+        <optgroup label="── Security Modernization (9.1) ──" class="iw-optgroup-hlr">
           <option value="Lateral Security with vDefend Blueprint">Lateral Security with vDefend Blueprint</option>
           <option value="VCF Component Backup and Restore Blueprint">VCF Component Backup and Restore Blueprint</option>
           <option value="VCF Instance Backup and Restore Blueprint">VCF Instance Backup and Restore Blueprint</option>
@@ -610,19 +671,19 @@
     <!-- Toolbar -->
     <div id="toolbar">
       <button class="btn btn-primary" id="edit-btn" onclick="openEditModal()" disabled>✏️ Edit</button>
-      <button class="btn" style="background:#6c5ce7;color:white;font-size:12px;" id="notes-btn" onclick="openBulkNotesModal()" disabled>📝 Edit Notes</button>
+      <button class="btn iw-btn-hlr" id="notes-btn" onclick="openBulkNotesModal()" disabled>📝 Edit Notes</button>
       <div class="sep"></div>
-      <button class="btn" style="background:#f0f0f0;color:#555;font-size:12px;" onclick="openAddDDModal()">＋ Add DD</button>
+      <button class="btn iw-btn-neutral" onclick="openAddDDModal()">＋ Add DD</button>
       <button class="btn btn-toggle" id="group-btn" onclick="toggleGroupBy()">⊞ Group by Category</button>
       <div class="sep"></div>
-      <button class="btn" style="background:#f39c12;color:white;font-size:12px;" id="mark-btn" onclick="markSelected()" disabled>⭐ Mark for Export</button>
-      <button class="btn" style="background:#f0f0f0;color:#555;font-size:12px;" id="unmark-btn" onclick="unmarkSelected()" disabled>☆ Unmark</button>
+      <button class="btn btn-warning" id="mark-btn" onclick="markSelected()" disabled>⭐ Mark for Export</button>
+      <button class="btn iw-btn-neutral" id="unmark-btn" onclick="unmarkSelected()" disabled>☆ Unmark</button>
       <div class="sep"></div>
-      <button class="btn" style="background:#f0f0f0;color:#555;font-size:12px;" onclick="selectAllVisible()">Select All</button>
-      <button class="btn" style="background:#f0f0f0;color:#555;font-size:12px;" onclick="deselectAll()">Deselect All</button>
-      <div id="selection-info" style="font-size:12px;color:#555;white-space:nowrap;">0 selected</div>
+      <button class="btn iw-btn-neutral" onclick="selectAllVisible()">Select All</button>
+      <button class="btn iw-btn-neutral" onclick="deselectAll()">Deselect All</button>
+      <div id="selection-info" class="iw-muted-text" style="font-size:12px;white-space:nowrap;">0 selected</div>
       <div style="flex:1"></div>
-      <label style="font-size:11px;color:#666;margin-right:4px;">Rows per page:</label>
+      <label class="iw-muted-text" style="font-size:11px;margin-right:4px;">Rows per page:</label>
       <select id="page-size" onchange="changePageSize()">
         <option value="25">25</option>
         <option value="50" selected>50</option>
@@ -653,7 +714,7 @@
         <tbody id="table-body"></tbody>
       </table>
       <div id="empty-state" style="display:none">
-        <svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" stroke="#ccc" stroke-width="2" fill="none"/><path d="M16 24h16M24 16v16" stroke="#ccc" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" stroke="var(--gray-border)" stroke-width="2" fill="none"/><path d="M16 24h16M24 16v16" stroke="var(--gray-border)" stroke-width="2" stroke-linecap="round"/></svg>
         <p id="empty-state-msg">No design decisions match your filters.</p>
       </div>
     </div>
@@ -679,11 +740,11 @@
       <div class="field-row">
         <div class="field-group">
           <label>Design Decision ID</label>
-          <input type="text" id="edit-id" readonly style="background:#f5f5f5;color:#666;">
+          <input type="text" id="edit-id" readonly class="iw-readonly-input">
         </div>
         <div class="field-group">
           <label>Component</label>
-          <input type="text" id="edit-component" readonly style="background:#f5f5f5;color:#666;">
+          <input type="text" id="edit-component" readonly class="iw-readonly-input">
         </div>
       </div>
       <div class="field-row">
@@ -697,7 +758,7 @@
         </div>
         <div class="field-group">
           <label>Category</label>
-          <input type="text" id="edit-subsection" readonly style="background:#f5f5f5;color:#666;font-size:11px;">
+          <input type="text" id="edit-subsection" readonly class="iw-readonly-input" style="font-size:11px;">
         </div>
       </div>
       <div class="field-group">
@@ -746,20 +807,20 @@
 </div>
 
 <!-- Bulk Notes Modal -->
-<div id="notes-modal-overlay" onclick="if(event.target===this)closeNotesModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
-  <div style="background:white;border-radius:8px;width:520px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-    <div style="padding:16px 20px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;">
+<div id="notes-modal-overlay" onclick="if(event.target===this)closeNotesModal()" class="iw-modal-overlay" style="display:none;position:fixed;inset:0;z-index:1000;align-items:center;justify-content:center;">
+  <div class="iw-modal-box" style="border-radius:8px;width:520px;max-width:95vw;">
+    <div class="iw-modal-header" style="padding:16px 20px;display:flex;align-items:center;gap:10px;">
       <h2 style="font-size:15px;font-weight:700;flex:1;">📝 Edit Notes — <span id="notes-modal-count"></span></h2>
-      <button onclick="closeNotesModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#666;">&times;</button>
+      <button onclick="closeNotesModal()" class="iw-modal-close" style="font-size:20px;cursor:pointer;">&times;</button>
     </div>
     <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px;">
-      <p style="font-size:12px;color:#666;">This note will be applied to all selected design decisions. Existing notes will be replaced.</p>
+      <p class="iw-muted-text" style="font-size:12px;">This note will be applied to all selected design decisions. Existing notes will be replaced.</p>
       <div class="field-group">
         <label>Notes</label>
-        <textarea id="bulk-notes-text" rows="5" style="width:100%;padding:8px;border:1px solid #d0d5dd;border-radius:4px;font-size:13px;font-family:Arial,sans-serif;resize:vertical;"></textarea>
+        <textarea id="bulk-notes-text" rows="5" class="iw-input-border" style="width:100%;padding:8px;border-radius:4px;font-size:13px;font-family:Arial,sans-serif;resize:vertical;"></textarea>
       </div>
     </div>
-    <div style="padding:12px 20px;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:8px;">
+    <div class="iw-modal-footer" style="padding:12px 20px;display:flex;justify-content:flex-end;gap:8px;">
       <button class="btn btn-modal-cancel" onclick="closeNotesModal()">Cancel</button>
       <button class="btn btn-modal-save" onclick="saveBulkNotes()">Apply to Selected</button>
     </div>
@@ -767,12 +828,12 @@
 </div>
 
 <!-- Add DD Modal -->
-<div id="add-dd-modal-overlay" onclick="if(event.target===this)closeAddDDModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
-  <div style="background:white;border-radius:8px;width:760px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-    <div style="padding:16px 20px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;">
+<div id="add-dd-modal-overlay" onclick="if(event.target===this)closeAddDDModal()" class="iw-modal-overlay" style="display:none;position:fixed;inset:0;z-index:1000;align-items:center;justify-content:center;">
+  <div class="iw-modal-box" style="border-radius:8px;width:760px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;">
+    <div class="iw-modal-header" style="padding:16px 20px;display:flex;align-items:center;gap:10px;">
       <h2 style="font-size:15px;font-weight:700;flex:1;">＋ Add Temporary Design Decision</h2>
-      <span style="font-size:11px;color:#e67e22;background:#fff3cd;padding:2px 8px;border-radius:10px;font-weight:600;">Temporary — lost on reload</span>
-      <button onclick="closeAddDDModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#666;">&times;</button>
+      <span class="iw-badge-warning-inline">Temporary — lost on reload</span>
+      <button onclick="closeAddDDModal()" class="iw-modal-close" style="font-size:20px;cursor:pointer;">&times;</button>
     </div>
     <div style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px;">
       <div class="field-row">
@@ -840,7 +901,7 @@
         <textarea id="add-notes" rows="2"></textarea>
       </div>
     </div>
-    <div style="padding:12px 20px;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:8px;">
+    <div class="iw-modal-footer" style="padding:12px 20px;display:flex;justify-content:flex-end;gap:8px;">
       <button class="btn btn-modal-cancel" onclick="closeAddDDModal()">Cancel</button>
       <button class="btn btn-modal-save" onclick="saveNewDD()">Add Design Decision</button>
     </div>
@@ -848,16 +909,16 @@
 </div>
 
 <!-- About Modal -->
-<div id="about-modal-overlay" onclick="if(event.target===this)closeAboutModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;align-items:center;justify-content:center;">
-  <div style="background:white;border-radius:10px;width:580px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.3);font-family:Arial,sans-serif;" id="about-modal-box">
-    <div style="background:linear-gradient(135deg,#1a1a2e,#0074d9);padding:28px 28px 20px;border-radius:10px 10px 0 0;color:white;">
+<div id="about-modal-overlay" class="am-overlay" onclick="if(event.target===this)closeAboutModal()">
+  <div class="am-box" id="about-modal-box">
+    <div class="am-header">
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
         <svg viewBox="0 0 36 36" fill="none" style="width:42px;height:42px;flex-shrink:0;"><rect width="36" height="36" rx="8" fill="rgba(255,255,255,0.15)"/><path d="M9 18h18M9 11h10M9 25h14" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
         <div>
           <h2 style="font-size:18px;font-weight:700;margin-bottom:3px;">VCF Design Decision Library</h2>
           <p style="font-size:12px;opacity:0.75;">VMware Cloud Foundation 9.0 — Interactive Explorer</p>
         </div>
-        <button onclick="closeAboutModal()" style="margin-left:auto;background:rgba(255,255,255,0.15);border:none;color:white;font-size:18px;cursor:pointer;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">&times;</button>
+        <button onclick="closeAboutModal()" class="am-close-btn">&times;</button>
       </div>
       <div style="display:flex;gap:20px;font-size:11px;opacity:0.8;margin-top:8px;">
         <span>👤 Author: <strong>L.COSCIA</strong></span>
@@ -869,81 +930,81 @@
     <div style="padding:24px 28px;display:flex;flex-direction:column;gap:20px;">
 
       <div>
-        <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#0074d9;margin-bottom:10px;">✨ Features</h3>
+        <h3 class="am-section-title">✨ Features</h3>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <div style="background:#f5f7fa;border-radius:6px;padding:10px 12px;font-size:12px;">
+          <div class="am-feature-card">
             <div style="font-weight:700;margin-bottom:3px;">🔍 Search & Filter</div>
-            <div style="color:#666;">Full-text search across all fields. Filter by Component, Type, Category, Status and Criticality.</div>
+            <div class="am-feature-desc">Full-text search across all fields. Filter by Component, Type, Category, Status and Criticality.</div>
           </div>
-          <div style="background:#f5f7fa;border-radius:6px;padding:10px 12px;font-size:12px;">
+          <div class="am-feature-card">
             <div style="font-weight:700;margin-bottom:3px;">⊞ Group by Category</div>
-            <div style="color:#666;">Toggle grouping by category with collapsible sections for better navigation.</div>
+            <div class="am-feature-desc">Toggle grouping by category with collapsible sections for better navigation.</div>
           </div>
-          <div style="background:#f5f7fa;border-radius:6px;padding:10px 12px;font-size:12px;">
+          <div class="am-feature-card">
             <div style="font-weight:700;margin-bottom:3px;">↔ Resizable Columns</div>
-            <div style="color:#666;">Drag column borders to resize. All content is readable at any width.</div>
+            <div class="am-feature-desc">Drag column borders to resize. All content is readable at any width.</div>
           </div>
-          <div style="background:#f5f7fa;border-radius:6px;padding:10px 12px;font-size:12px;">
+          <div class="am-feature-card">
             <div style="font-weight:700;margin-bottom:3px;">✏️ Edit Design Decisions</div>
-            <div style="color:#666;">Edit any field including Type, Status, Criticality, Notes and Justification.</div>
+            <div class="am-feature-desc">Edit any field including Type, Status, Criticality, Notes and Justification.</div>
           </div>
-          <div style="background:#f5f7fa;border-radius:6px;padding:10px 12px;font-size:12px;">
+          <div class="am-feature-card">
             <div style="font-weight:700;margin-bottom:3px;">⭐ Mark for Export</div>
-            <div style="color:#666;">Star individual rows or bulk-mark selections. Stats by component shown in sidebar.</div>
+            <div class="am-feature-desc">Star individual rows or bulk-mark selections. Stats by component shown in sidebar.</div>
           </div>
-          <div style="background:#f5f7fa;border-radius:6px;padding:10px 12px;font-size:12px;">
+          <div class="am-feature-card">
             <div style="font-weight:700;margin-bottom:3px;">📤 Excel Export</div>
-            <div style="color:#666;">Export marked, selected, or all filtered decisions in the original Excel format.</div>
+            <div class="am-feature-desc">Export marked, selected, or all filtered decisions in the original Excel format.</div>
           </div>
-          <div style="background:#f5f7fa;border-radius:6px;padding:10px 12px;font-size:12px;">
+          <div class="am-feature-card">
             <div style="font-weight:700;margin-bottom:3px;">📥 Import Excel</div>
-            <div style="color:#666;">Drag & drop or browse to import a new Design Library .xlsx file.</div>
+            <div class="am-feature-desc">Drag & drop or browse to import a new Design Library .xlsx file.</div>
           </div>
-          <div style="background:#f5f7fa;border-radius:6px;padding:10px 12px;font-size:12px;">
+          <div class="am-feature-card">
             <div style="font-weight:700;margin-bottom:3px;">＋ Temporary DD</div>
-            <div style="color:#666;">Add custom Design Decisions for the session (marked TEMP, not persisted).</div>
+            <div class="am-feature-desc">Add custom Design Decisions for the session (marked TEMP, not persisted).</div>
           </div>
-          <div style="background:#f5f7fa;border-radius:6px;padding:10px 12px;font-size:12px;">
+          <div class="am-feature-card">
             <div style="font-weight:700;margin-bottom:3px;">📝 Bulk Notes</div>
-            <div style="color:#666;">Apply notes to multiple selected Design Decisions in one action.</div>
+            <div class="am-feature-desc">Apply notes to multiple selected Design Decisions in one action.</div>
           </div>
-          <div style="background:#f5f7fa;border-radius:6px;padding:10px 12px;font-size:12px;">
+          <div class="am-feature-card">
             <div style="font-weight:700;margin-bottom:3px;">🌙 Dark Theme</div>
-            <div style="color:#666;">Toggle dark/light mode for comfortable use in any environment.</div>
+            <div class="am-feature-desc">Toggle dark/light mode for comfortable use in any environment.</div>
           </div>
-          <div style="background:#f5f7fa;border-radius:6px;padding:10px 12px;font-size:12px;">
+          <div class="am-feature-card">
             <div style="font-weight:700;margin-bottom:3px;">🔖 Source Tracking</div>
-            <div style="color:#666;">Each DD is tagged with its origin: <strong>Excel</strong> (library only), <strong>Web Doc</strong> (official docs only), or <strong>Both</strong>. Filterable.</div>
+            <div class="am-feature-desc">Each DD is tagged with its origin: <strong>Excel</strong> (library only), <strong>Web Doc</strong> (official docs only), or <strong>Both</strong>. Filterable.</div>
           </div>
-          <div style="background:#f5f7fa;border-radius:6px;padding:10px 12px;font-size:12px;">
+          <div class="am-feature-card">
             <div style="font-weight:700;margin-bottom:3px;">🖱️ Click-to-Edit ID</div>
-            <div style="color:#666;">Click directly on an ID in the table to instantly open its edit modal — no selection step needed.</div>
+            <div class="am-feature-desc">Click directly on an ID in the table to instantly open its edit modal — no selection step needed.</div>
           </div>
-          <div style="background:#f5f7fa;border-radius:6px;padding:10px 12px;font-size:12px;">
+          <div class="am-feature-card">
             <div style="font-weight:700;margin-bottom:3px;">⭐ Marked Filter</div>
-            <div style="color:#666;">Filter the table to show only marked or unmarked Design Decisions via the sidebar.</div>
+            <div class="am-feature-desc">Filter the table to show only marked or unmarked Design Decisions via the sidebar.</div>
           </div>
-          <div style="background:#f5f7fa;border-radius:6px;padding:10px 12px;font-size:12px;">
+          <div class="am-feature-card">
             <div style="font-weight:700;margin-bottom:3px;">🔀 Multi-version Support</div>
-            <div style="color:#666;">Switch between <strong>VCF 9.0</strong> and <strong>VCF 9.1</strong> via the header dropdown. Import a new Excel to populate VCF 9.1 data.</div>
+            <div class="am-feature-desc">Switch between <strong>VCF 9.0</strong> and <strong>VCF 9.1</strong> via the header dropdown. Import a new Excel to populate VCF 9.1 data.</div>
           </div>
-          <div style="background:#f0eeff;border-radius:6px;padding:10px 12px;font-size:12px;border:1px solid #d0c8f0;">
+          <div class="am-feature-card-highlight">
             <div style="font-weight:700;margin-bottom:3px;">📐 Blueprint View</div>
-            <div style="color:#666;">Switch between all <strong>19 blueprints</strong> (5 VCF Fleet topologies + 14 VCF 9.1 blueprints). Each blueprint shows its High Level Deployment Requirements (Physical Hosts, VLANs, Virtual Networking).</div>
+            <div class="am-feature-desc">Switch between all <strong>19 blueprints</strong> (5 VCF Fleet topologies + 14 VCF 9.1 blueprints). Each blueprint shows its High Level Deployment Requirements (Physical Hosts, VLANs, Virtual Networking).</div>
           </div>
-          <div style="background:#f0eeff;border-radius:6px;padding:10px 12px;font-size:12px;border:1px solid #d0c8f0;">
+          <div class="am-feature-card-highlight">
             <div style="font-weight:700;margin-bottom:3px;">📚 Design Library View</div>
-            <div style="color:#666;">Full access to all Design Decisions (VCF 9.0: <strong>687 DDs</strong> · VCF 9.1: <strong>998 DDs</strong>) — no login required. Switch modes via the tab bar above the table.</div>
+            <div class="am-feature-desc">Full access to all Design Decisions (VCF 9.0: <strong>687 DDs</strong> · VCF 9.1: <strong>998 DDs</strong>) — no login required. Switch modes via the tab bar above the table.</div>
           </div>
         </div>
       </div>
 
       <div>
-        <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#0074d9;margin-bottom:10px;">📋 Changelog</h3>
-        <div style="font-size:12px;border-left:3px solid #0074d9;padding-left:14px;display:flex;flex-direction:column;gap:10px;">
+        <h3 class="am-section-title">📋 Changelog</h3>
+        <div class="am-changelog-list">
           <div>
-            <div style="font-weight:700;color:#1a1a2e;">v2.1 — VCF 9.1 Full Dataset</div>
-            <div style="color:#666;margin-top:3px;">
+            <div class="am-changelog-title">v2.1 — VCF 9.1 Full Dataset</div>
+            <div class="am-changelog-desc">
               <ul style="margin:4px 0 0 14px;padding:0;display:flex;flex-direction:column;gap:3px;">
                 <li>Integrated official Broadcom Excel (VCF 9.1) — <strong>998 Design Decisions</strong> for VCF 9.1 (cross-referenced Excel + Web Doc): <strong>772 Both</strong> · <strong>166 Excel</strong> · <strong>60 Web Doc</strong>.</li>
                 <li>Added <strong>14 new blueprints</strong> (VCF 9.1): Fleet Management, Monitoring &amp; Alerting, Troubleshooting, Edge (ArgoCD / Government / Manufacturing), Multi-Tenant Private Cloud, VKS, Private AI, vDefend, Backup &amp; Restore, Instance Recovery, Fleet DR, Cyber Recovery — with HLR data.</li>
@@ -953,8 +1014,8 @@
             </div>
           </div>
           <div>
-            <div style="font-weight:700;color:#1a1a2e;">v2.0 — Open Access &amp; Data Quality</div>
-            <div style="color:#666;margin-top:3px;">
+            <div class="am-changelog-title">v2.0 — Open Access &amp; Data Quality</div>
+            <div class="am-changelog-desc">
               <ul style="margin:4px 0 0 14px;padding:0;display:flex;flex-direction:column;gap:3px;">
                 <li>Removed authentication gate — app is now fully public with no login required.</li>
                 <li>Removed Supabase, EmailJS SDKs and all auth/admin code (~756 lines).</li>
@@ -966,8 +1027,8 @@
             </div>
           </div>
           <div>
-            <div style="font-weight:700;color:#1a1a2e;">v1.6 — Invite Flow &amp; Admin Fixes</div>
-            <div style="color:#666;margin-top:3px;">
+            <div class="am-changelog-title">v1.6 — Invite Flow &amp; Admin Fixes</div>
+            <div class="am-changelog-desc">
               <ul style="margin:4px 0 0 14px;padding:0;display:flex;flex-direction:column;gap:3px;">
                 <li>Set-password modal when accepting an invite link.</li>
                 <li>Approve request via <strong>generateLink</strong> (bypasses Supabase SMTP rate limit).</li>
@@ -977,8 +1038,8 @@
             </div>
           </div>
           <div>
-            <div style="font-weight:700;color:#1a1a2e;">v1.5 — Supabase Auth</div>
-            <div style="color:#666;margin-top:3px;">
+            <div class="am-changelog-title">v1.5 — Supabase Auth</div>
+            <div class="am-changelog-desc">
               <ul style="margin:4px 0 0 14px;padding:0;display:flex;flex-direction:column;gap:3px;">
                 <li>Authentication migrated to <strong>Supabase Auth</strong> (bcrypt server-side, JWT sessions).</li>
                 <li>Sessions persistantes cross-browser et en navigation privée.</li>
@@ -988,8 +1049,8 @@
             </div>
           </div>
           <div>
-            <div style="font-weight:700;color:#1a1a2e;">v1.4 — Private Library &amp; Admin Panel</div>
-            <div style="color:#666;margin-top:3px;">
+            <div class="am-changelog-title">v1.4 — Private Library &amp; Admin Panel</div>
+            <div class="am-changelog-desc">
               <ul style="margin:4px 0 0 14px;padding:0;display:flex;flex-direction:column;gap:3px;">
                 <li>Added <strong>Private Library</strong> section with authentication (SHA-256 hashed passwords, sessionStorage).</li>
                 <li>Embedded <strong>1,547 Low-Level Design Decisions</strong> across 5 VCF Fleet blueprints.</li>
@@ -1000,8 +1061,8 @@
             </div>
           </div>
           <div>
-            <div style="font-weight:700;color:#1a1a2e;">v1.3 — Multi-version Support</div>
-            <div style="color:#666;margin-top:3px;">
+            <div class="am-changelog-title">v1.3 — Multi-version Support</div>
+            <div class="am-changelog-desc">
               <ul style="margin:4px 0 0 14px;padding:0;display:flex;flex-direction:column;gap:3px;">
                 <li>Added <strong>version selector</strong> in the header to switch between VCF 9.0 and VCF 9.1.</li>
                 <li>VCF 9.0 data is embedded. VCF 9.1 slot is ready — import an Excel file to populate it.</li>
@@ -1011,8 +1072,8 @@
             </div>
           </div>
           <div>
-            <div style="font-weight:700;color:#1a1a2e;">v1.2 — Click-to-Edit &amp; Marked Filter</div>
-            <div style="color:#666;margin-top:3px;">
+            <div class="am-changelog-title">v1.2 — Click-to-Edit &amp; Marked Filter</div>
+            <div class="am-changelog-desc">
               <ul style="margin:4px 0 0 14px;padding:0;display:flex;flex-direction:column;gap:3px;">
                 <li>Clicking directly on a <strong>Design Decision ID</strong> in the table now opens its edit modal instantly.</li>
                 <li>Added <strong>Marked Status filter</strong> in the sidebar to show only ⭐ marked or unmarked decisions.</li>
@@ -1020,8 +1081,8 @@
             </div>
           </div>
           <div>
-            <div style="font-weight:700;color:#1a1a2e;">v1.1 — Source Tracking &amp; Deduplication</div>
-            <div style="color:#666;margin-top:3px;">
+            <div class="am-changelog-title">v1.1 — Source Tracking &amp; Deduplication</div>
+            <div class="am-changelog-desc">
               <ul style="margin:4px 0 0 14px;padding:0;display:flex;flex-direction:column;gap:3px;">
                 <li>Added <strong>Source</strong> field to every Design Decision: <em>Excel</em> (library only), <em>Web Doc</em> (official Broadcom TechDocs only), or <em>Both</em>.</li>
                 <li>Integrated <strong>42 missing DDs</strong> sourced exclusively from the official VCF 9.0 documentation (new components: NECE; new topics: VPCFSVC, SWS, BGP dual-AZ, and others).</li>
@@ -1032,18 +1093,18 @@
             </div>
           </div>
           <div>
-            <div style="font-weight:700;color:#1a1a2e;">v1.0 — Initial Release</div>
-            <div style="color:#666;margin-top:3px;">Full Design Decision explorer with search, filters, pagination, column resize, edit modal, Excel import/export, category grouping, mark for export, bulk notes, temporary DD, dark theme and responsive layout.</div>
+            <div class="am-changelog-title">v1.0 — Initial Release</div>
+            <div class="am-changelog-desc">Full Design Decision explorer with search, filters, pagination, column resize, edit modal, Excel import/export, category grouping, mark for export, bulk notes, temporary DD, dark theme and responsive layout.</div>
           </div>
         </div>
       </div>
 
-      <div style="background:#fff8e1;border-radius:6px;padding:12px 14px;font-size:11px;color:#7a5c00;border:1px solid #ffe082;">
+      <div class="am-note-box">
         <strong>Note:</strong> Edits, marks and temporary DDs are session-only and will be lost on page reload. Use <em>Export Marked</em> to save your selections before closing.
       </div>
 
     </div>
-    <div style="padding:14px 28px;border-top:1px solid #eee;display:flex;justify-content:flex-end;">
+    <div class="am-footer">
       <button class="btn btn-primary" onclick="closeAboutModal()">Close</button>
     </div>
   </div>
@@ -1053,7 +1114,7 @@
 <div id="import-modal-overlay" onclick="closeImportModal(event)">
   <div id="import-modal">
     <h2>Import Design Library</h2>
-    <p style="font-size:12px;color:#666;margin-bottom:4px;">Upload a VCF Design Library Excel file (.xlsx) to replace the current data. The file must have the same structure as the original.</p>
+    <p class="iw-muted-text" style="font-size:12px;margin-bottom:4px;">Upload a VCF Design Library Excel file (.xlsx) to replace the current data. The file must have the same structure as the original.</p>
     <div id="drop-zone" onclick="document.getElementById('import-file').click()" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
       <p>Drop file here or click to browse</p>
       <small>.xlsx files only</small>
@@ -1061,7 +1122,7 @@
     <input type="file" id="import-file" accept=".xlsx" onchange="handleFileSelect(event)">
     <div id="import-status"></div>
     <div id="import-footer">
-      <button class="btn" style="background:#f0f0f0;color:#333;" onclick="closeImportModal()">Cancel</button>
+      <button class="btn iw-btn-neutral" onclick="closeImportModal()">Cancel</button>
     </div>
   </div>
 </div>
@@ -1071,7 +1132,7 @@
 
 <!-- Footer -->
 <div id="footer">
-  <svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="#aaa"/></svg>
+  <svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="var(--text-muted)"/></svg>
   L.COSCIA · v2.1
 </div>
 
@@ -1593,7 +1654,7 @@ function makeRow(d) {
   tr.innerHTML = `
     <td class="mark-cell"><button class="mark-btn ${isMarked?'marked':''}" onclick="toggleMark(${d._uid},event)" title="${isMarked?'Unmark':'Mark for export'}">⭐</button></td>
     <td><input type="checkbox" ${selectedUids.has(d._uid)?'checked':''} onchange="toggleSelect(${d._uid},this)"></td>
-    <td><div class="cell-content" title="${escAttr(d.subsection)}">${escHtml(d.subsection)||'<span style="color:#ccc">—</span>'}</div></td>
+    <td><div class="cell-content" title="${escAttr(d.subsection)}">${escHtml(d.subsection)||'<span style="color:var(--text-muted)">—</span>'}</div></td>
     <td class="id-cell"><div class="cell-content"><span class="id-link" onclick="selectAndEdit(${d._uid},event)" title="Click to edit">${escHtml(d.id)}</span>${tempBadge}</div></td>
     <td><div class="cell-content">${escHtml(d.component)}</div></td>
     <td>${typeBadge}</td>
@@ -1602,7 +1663,7 @@ function makeRow(d) {
     <td><div class="cell-content" title="${escAttr(d.justification)}">${escHtml(d.justification)}</div></td>
     <td>${statusBadge}</td>
     <td>${critBadge}</td>
-    <td><div class="cell-content" title="${escAttr(d.notes)}">${escHtml(d.notes)||'<span style="color:#ccc">—</span>'}</div></td>
+    <td><div class="cell-content" title="${escAttr(d.notes)}">${escHtml(d.notes)||'<span style="color:var(--text-muted)">—</span>'}</div></td>
   `;
   tr.style.cursor = 'pointer';
   tr.addEventListener('click', (e) => {
@@ -1657,7 +1718,7 @@ function renderGrouped(tbody) {
     groupTr.dataset.group = groupKey;
     groupTr.innerHTML = `<td colspan="12">
       <span class="group-toggle">${isCollapsed ? '▶' : '▼'}</span>
-      ${escHtml(groupKey)} <span style="color:#999;font-weight:400;text-transform:none;">(${items.length})</span>
+      ${escHtml(groupKey)} <span style="color:var(--text-muted);font-weight:400;text-transform:none;">(${items.length})</span>
     </td>`;
     groupTr.addEventListener('click', () => toggleGroup(groupKey));
     tbody.appendChild(groupTr);
@@ -1724,7 +1785,7 @@ function renderPagination(totalPages) {
   pages.forEach(p => {
     if (p === '...') {
       const span = document.createElement('span');
-      span.textContent = '…'; span.style.padding = '0 4px'; span.style.color = '#999';
+      span.textContent = '…'; span.style.padding = '0 4px'; span.style.color = 'var(--text-muted)';
       nums.appendChild(span);
     } else {
       const btn = document.createElement('button');
@@ -2208,11 +2269,7 @@ function applyCollapsedToCells() {
 function toggleDarkTheme() {
   const isDark = document.body.classList.toggle('dark');
   document.getElementById('theme-btn').textContent = isDark ? '☀️' : '🌙';
-  // Update modal boxes that use inline white background
-  document.querySelectorAll('#about-modal-box').forEach(el => {
-    el.style.background = isDark ? '#1a1a2e' : 'white';
-    el.style.color = isDark ? '#d0d0e8' : '';
-  });
+  // Modal colors now follow the body.dark CSS cascade via .am-* classes — no JS patching needed.
   // Persist preference
   try { localStorage.setItem('vcf-theme', isDark ? 'dark' : 'light'); } catch(e) {}
 }
@@ -2238,16 +2295,7 @@ function openAboutModal() {
   const webOnly = allData.filter(d => d.source === 'Web Doc').length;
   const excelOnly = allData.filter(d => d.source === 'Excel').length;
   document.getElementById('about-dd-count').textContent = `📊 ${total} Design Decisions (${both} both · ${excelOnly} Excel · ${webOnly} Web Doc)`;
-  // Apply dark theme to modal box if dark mode active
-  const box = document.getElementById('about-modal-box');
-  if (document.body.classList.contains('dark')) {
-    box.style.background = '#1a1a2e';
-    box.style.color = '#d0d0e8';
-    box.querySelectorAll('[style*="background:#f5f7fa"]').forEach(el => el.style.background = '#252545');
-    box.querySelectorAll('[style*="color:#666"]').forEach(el => el.style.color = '#8888aa');
-    box.querySelectorAll('[style*="color:#1a1a2e"]').forEach(el => el.style.color = '#d0d0e8');
-    box.querySelectorAll('[style*="border-top:1px solid #eee"]').forEach(el => el.style.borderColor = '#303060');
-  }
+  // Dark theme colors are handled by the body.dark CSS cascade via .am-* classes — no JS patching needed.
 }
 
 function closeAboutModal() {
@@ -2300,7 +2348,7 @@ function renderHLRPanel(key) {
 function renderHLRTab(key, tab) {
   const d = BLUEPRINT_HLR_STRUCTURED[key];
   const el = document.getElementById('hlr-tab-content');
-  if (!d) { el.innerHTML = '<em style="color:#999">No data available for this blueprint.</em>'; return; }
+  if (!d) { el.innerHTML = '<em style="color:var(--text-muted)">No data available for this blueprint.</em>'; return; }
 
   if (tab === 'hosts') {
     el.innerHTML = '<table class="hlr-table hlr-resizable" style="table-layout:fixed;width:100%;"><thead><tr>' +
@@ -2313,7 +2361,7 @@ function renderHLRTab(key, tab) {
         '<td><strong>' + escHtml(h.role) + '</strong></td>' +
         '<td style="text-align:center"><span class="hlr-badge">' + escHtml(h.min) + '</span></td>' +
         '<td style="text-align:center"><span class="hlr-badge">' + escHtml(h.recommended) + '</span></td>' +
-        '<td style="color:#666;font-size:11px;">' + escHtml(h.notes) + '</td>' +
+        '<td style="color:var(--text-muted);font-size:11px;">' + escHtml(h.notes) + '</td>' +
         '</tr>').join('') +
       '</tbody></table>';
     initHLRResize();
