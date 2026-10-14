@@ -3,8 +3,8 @@
 An interactive single-page web application to browse, filter, edit, and export VMware Cloud Foundation Design Decisions — with full access to Blueprint Deployment References across all 5 VCF Fleet blueprints.
 
 > **Author:** L.COSCIA  
-> **Version:** 2.1  
-> **Data:** 687 DDs VCF 9.0 (670 Excel + 17 Web Doc) · 998 DDs VCF 9.1 (772 Both + 166 Excel + 60 Web Doc) · 19 Blueprints (5 fleet topologies + 14 VCF 9.1)
+> **Version:** 2.3  
+> **Data:** 680 DDs VCF 9.0 (473 Both + 156 Excel + 51 Web Doc) · 1,154 DDs VCF 9.1 (825 Both + 277 Excel + 52 Web Doc) · 1,330 DDs VCF 9.1.1 (1,191 Both + 87 Excel + 52 Web Doc) · 19 Blueprints (5 fleet topologies + 14 VCF 9.1/9.1.1)
 
 ---
 
@@ -19,9 +19,9 @@ This tool provides a fast, offline-capable interface for the VCF Design Library.
 | Feature | Description |
 |---|---|
 | 📐 **Blueprint View** | Switch between all 5 VCF Fleet blueprints with High Level Deployment Requirements (Physical Hosts, VLANs, Virtual Networking) |
-| 📚 **Design Library View** | Full access to all 670 Design Decisions across 28 components — toggle via the tab bar |
-| 🔀 **Multi-version Support** | Switch between VCF 9.0 and VCF 9.1 via the header dropdown |
-| 🔍 **Search & Filter** | Full-text search across all fields. Filter by Component, Type, Category, Status, Criticality and Marked status |
+| 📚 **Design Library View** | Full access to all Design Decisions of the selected version (680 / 1,154 / 1,330) — toggle via the tab bar |
+| 🔀 **Multi-version Support** | Switch between VCF 9.0, VCF 9.1 and VCF 9.1.1 via the header dropdown |
+| 🔍 **Search & Filter** | Full-text search across all fields. Filter by Component, Type, Category, Source, Status, Criticality, Marked status and Change vs 9.1 |
 | ⊞ **Group by Category** | Toggle category grouping with collapsible sections |
 | ↔ **Resizable Columns** | Drag column borders to adjust width |
 | 🖱️ **Click-to-Edit ID** | Click directly on a Design Decision ID to instantly open its edit modal |
@@ -32,6 +32,7 @@ This tool provides a fast, offline-capable interface for the VCF Design Library.
 | ＋ **Temporary DD** | Add custom Design Decisions for the session (marked TEMP) |
 | 📝 **Bulk Notes** | Apply notes to all selected Design Decisions at once |
 | 🔖 **Source Tracking** | Each DD tagged with its origin: Excel, Web Doc, or Both |
+| 🆕 **Change vs 9.1** | VCF 9.1.1 DDs carry NEW / CHANGED / RENUM badges (renumbered DDs show their 9.1 ID), with a matching sidebar filter |
 | 🌙 **Dark Theme** | Toggle dark/light mode — preference persisted in `localStorage` |
 | 📱 **Responsive** | Sidebar collapses to a slide-in drawer on mobile/tablet |
 
@@ -54,10 +55,10 @@ This tool provides a fast, offline-capable interface for the VCF Design Library.
 ### Switch between Blueprint and Design Library
 Use the **tab bar** at the top of the content area to toggle between:
 - **📐 Blueprint** — selects one of 5 VCF Fleet blueprints; shows the HLR panel (Physical Hosts, VLANs, Virtual Networking) and the blueprint's design decisions
-- **📚 Design Library** — shows the full 670-DD library with all filters active
+- **📚 Design Library** — shows the full library of the selected version with all filters active
 
 ### Switch VCF version
-Use the **version dropdown** in the header to switch between VCF 9.0 and VCF 9.1.
+Use the **version dropdown** in the header to switch between VCF 9.0, VCF 9.1 and VCF 9.1.1.
 
 ### Export your selection
 1. Star Design Decisions with ⭐ or select rows and click **Mark for Export**
@@ -71,6 +72,7 @@ Use the **version dropdown** in the header to switch between VCF 9.0 and VCF 9.1
 index.html                        ← Full app with all embedded data (open this)
 README.md
 VCF_LowLevelDesignDecisions/     ← Source xlsx files (5 blueprints)
+tools/                            ← Dataset build scripts (VCF 9.1.1) + TechDocs-derived inputs in tools/data/
 ```
 
 ---
@@ -79,19 +81,52 @@ VCF_LowLevelDesignDecisions/     ← Source xlsx files (5 blueprints)
 
 - **Pure HTML/CSS/JS** — no framework, no build step, no authentication
 - **SheetJS (xlsx.js)** loaded from CDN for Excel import/export
-- ~1.5 MB total file size (includes all embedded blueprint data)
+- ~3.7 MB total file size (includes all embedded datasets and blueprint data)
 
 ---
 
 ## Data Sources
 
-- **DDs**: VMware Cloud Foundation 9.0 Design Library (`.xlsx`) + Broadcom TechDocs
+- **DDs**: VMware Cloud Foundation Design Library Excel files (9.0, 9.1, 9.1.1 — `.xlsx`, not versioned) + Broadcom TechDocs
 - **Blueprint DDs**: VCF Fleet Blueprint Design Decision Workbooks (5 `.xlsx` files)
 - **High Level Requirements**: [Broadcom TechDocs — VCF 9.0 Blueprints](https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-0/design/blueprints.html)
 
 ---
 
+## Rebuilding the VCF 9.1.1 dataset
+
+Requires Python 3 with `openpyxl`, and the Excel files `VCF91 - Design Library.xlsx` and `VCF911 - Design Library.xlsx` in the project root.
+
+```bash
+python3 -I -B tools/build_vcf911.py . /tmp/vcf911.json \
+  --web-ids tools/data/web_ids_91x.txt --web-only tools/data/web_only_911.json
+python3 -I -B tools/update_index.py index.html --v911 /tmp/vcf911.json \
+  --v91-excel "VCF91 - Design Library.xlsx" --web-ids tools/data/web_ids_91x.txt \
+  --web-only-91 tools/data/web_only_91.json --drop-parasites \
+  --vdefend-blueprint tools/data/vdefend_blueprint_ids.txt
+```
+
+- `component` / `type` come from the ID (`tools/vcf_dd_lib.py`, mirrored by `ddComponent()` / `ddType()` in `index.html`).
+- `source`: Both if the ID appears on the VCF 9.1.x TechDocs design pages (`web_ids_91x.txt`), else Excel; web-only DDs are added as Web Doc.
+- `delta` / `prev_id`: computed against the VCF 9.1 Excel.
+- `update_index.py` is idempotent: it removes scrape artifacts (`--drop-parasites`), completes the 9.1 Excel import (`--v91-excel`), re-applies the 9.1 type rule, replaces the 9.1.1 array and fills the vDefend blueprint (`vdefend_blueprint_ids.txt`).
+
 ## Changelog
+
+### v2.3 — VCF 9.1.1 Dedicated Dataset
+- VCF 9.1.1 has its own dataset from `VCF911 - Design Library.xlsx` — **1,330 Design Decisions** (1,191 Both · 87 Excel · 52 Web Doc)
+- vs VCF 9.1: 187 new · 92 changed · 107 renumbered · 10 removed — NEW / CHANGED / RENUM badges and *Change vs 9.1* filter
+- New components **vDefend** (MDS/SSP/WDS/DVP/SEC-*) and **License Hub** (LH)
+- Type derived from REQD / RECD / RCMD anywhere in the ID (9.1 and 9.1.1); Type filter and modal lists are data-driven (adds *Choice*)
+- VCF 9.1 full reimport: +164 Excel rows that were cut after Excel row 1184 (PAIF-* and vDefend sections), 53 older Web Doc PAIF rows superseded, +51 web-only DDs from the VCF 9.1.x TechDocs pages — **1,154 DDs** (825 Both · 277 Excel · 52 Web Doc)
+- Removed web-scrape artifacts (header or sentence used as ID): 7 in VCF 9.0 (→ **680 DDs**), 6 in VCF 9.1, none in 9.1.1
+- **Lateral Security with vDefend Blueprint** populated with **101 DDs** (vDefend MDS/SSP/WDS/DVP + License Hub, as listed on the TechDocs blueprint pages)
+- ID column wider by default and auto-fitted to the longest ID + badges
+- Export title / file name follow the selected version; built-in import uses the same component/type rules
+
+### v2.2 — VCF 9.1.1 Added
+- Added VCF 9.1.1 (GA September 3, 2026) to the version selector, initially reusing the VCF 9.1 dataset and blueprints
+- About: 9.1.1 what's new, Bill of Materials and upgrade prerequisites
 
 ### v2.1 — VCF 9.1 Full Dataset
 - Integrated official Broadcom Excel (VCF 9.1) + web cross-reference — **998 Design Decisions** (772 Both · 166 Excel · 60 Web Doc)
