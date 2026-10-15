@@ -1,0 +1,470 @@
+[
+ {
+  "id": "VCF-NECE-RCMD-01",
+  "decision": "Single Platform Node\nSize based upon sizing document and best practices.",
+  "justification": "• Smallest footprint.\n• Can be scaled-out to a platform cluster.\n• Supports 10,000 virtual machines or objects.",
+  "implication": "• Requires a CPU and RAM reservation of 100% of the CPU and RAM assigned.\n• No, high availability\n• Requires the single node be deployed as an Extra Large size",
+  "subsection": "VCF Operations for Networks - Scaling",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-library/vcf-operations-design/vcf-operations-for-networks-deployment-models.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-NECE-RCMD-02",
+  "decision": "Platform Cluster\n• Three node clusters. Consisting of 3 platform instances. Can scale up to 15 XL nodes.\n• Cluster node sizing starts at a Large Platform Node Size and go up to Extra Large.",
+  "justification": "• Highly Performant.\n• Highly scalable.",
+  "implication": "• Cluster does not provide high availability. It is for performance.\n• Requires higher CPU and memory reservations to support additional nodes.",
+  "subsection": "VCF Operations for Networks - Scaling",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-library/vcf-operations-design/vcf-operations-for-networks-deployment-models.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-NECE-RCMD-03",
+  "decision": "Collector\nA single VM used to monitor remote VCF deployments and to send data back to the primary cluster.",
+  "justification": "• Highly Performant.\n• Highly scalable.",
+  "implication": "• Limitation of total flows is based on the capacity of the platform.\n• Requires understanding the amount of VMs, Flows, and Edges will be sending data to the collector.",
+  "subsection": "VCF Operations for Networks - Scaling",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-library/vcf-operations-design/vcf-operations-for-networks-deployment-models.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-REC-001",
+  "decision": "Orchestrate cyber and ransomware recovery processes through an end-to-end automated workflow across infrastructure, network, and security tooling.",
+  "justification": "• End-to-end automated recovery workflows eliminate human error and manual handoffs during incident response.\n• Significantly compresses operational downtime and minimizes the window during which business operations remain disrupted.",
+  "implication": "Requires deploying unified recovery orchestration platforms capable of automating network quarantine and workload restoration.",
+  "subsection": "Application Security and Recovery for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-application-security-and-recovery.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-REC-002",
+  "decision": "Restore workloads into an Isolated Recovery Environment (IRE) or Clean Room before re-introducing them into production.",
+  "justification": "• Restoring into an isolated recovery environment prevents compromised restore points from re-contaminating production networks.\n• Restricts malware payload execution to a quarantined space.\n• Minimizes the duration of operational risk during validation.",
+  "implication": "Requires building an isolated recovery network boundary (cleanroom) with dedicated compute and network quarantine rules.",
+  "subsection": "Application Security and Recovery for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-application-security-and-recovery.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-REC-003",
+  "decision": "Perform automated validation of restore point candidates in isolated cleanrooms using Next-Gen antivirus (NGAV) to detect fileless and file-based malware.",
+  "justification": "• Automated NGAV inspection on powered-on candidates identifies dormant malware and vulnerabilities before production failback.\n• Reduces the risk and timeframe of re-introducing threats back into production.",
+  "implication": "Requires integrating automated sandbox analysis and behavioral antivirus inspection into the cyber recovery pipeline.",
+  "subsection": "Application Security and Recovery for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-application-security-and-recovery.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-REC-004",
+  "decision": "Standardize on a unified management platform for cyber recovery across infrastructure, networking, orchestration, and restore point validation.",
+  "justification": "• Consolidates recovery operations into a single management plane eliminates tool fragmentation and cross-team friction.\n• Reduces RTO and minimizing the duration of business interruption during an incident.",
+  "implication": "Requires consolidating legacy backup, replication, and disaster recovery tools into an integrated platform.",
+  "subsection": "Application Security and Recovery for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-application-security-and-recovery.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-REC-005",
+  "decision": "Automate backup schedules to generate immutable, tamper-proof snapshots that resist deletion or modification by compromised administrative credentials.",
+  "justification": "• Cryptographically locked, immutable snapshots guarantee restore point integrity.\n• Prevents ransomware or malicious administrators from wiping recovery data and minimizing the window of irrecoverable data loss.",
+  "implication": "Requires enabling immutable cloud or air-gapped storage repositories with locked retention policies.",
+  "subsection": "Application Security and Recovery for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-application-security-and-recovery.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-REC-006",
+  "decision": "Test and validate cyber recovery plans at least quarterly using automated execution workflows in isolated sandboxes.",
+  "justification": "• Regular non-disruptive testing ensures that operational playbooks stay aligned with application changes.\n• Minimizes the time that is required to initiate recovery and preventing plan failures during live incidents.",
+  "implication": "• Requires adequate operational process to ensure that testing is prioritized to occur every 90 days.\n• Demands scheduling non-disruptive, automated DR dry-runs in isolated sandboxes every 90 days.",
+  "subsection": "Application Security and Recovery for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-application-security-and-recovery.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-REC-007",
+  "decision": "Automate workload compliance and vulnerability management across virtual machines and container workloads using desired-state enforcement and continuous CVE tracking.",
+  "justification": "• Guest-level vulnerability tracking and desired-state enforcement eliminate manual patching bottlenecks.\n• Reduces the duration application-layer vulnerabilities and configuration drift remain exposed to exploitation.",
+  "implication": "Requires deploying continuous workload compliance scanning and guest OS desired-state remediation tools.",
+  "subsection": "Application Security and Recovery for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-application-security-and-recovery.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-REC-008",
+  "decision": "Establish and validate a recovery architecture capable of meeting an RTO measured in hours for critical systems following a cyber incident.",
+  "justification": "• Achieving an RTO of hours minimizes the total timeframe of business disruption, financial loss, and operational outage.\n• A cyber attack or ransomware encryption event may result in destruction of data.",
+  "implication": "Demands automated, live-mount instant recovery capabilities from immutable cloud storage to local hypervisor clusters.",
+  "subsection": "Application Security and Recovery for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-application-security-and-recovery.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-WLDCON-DTGWVXLAN-REQD-CFG-025",
+  "decision": "Assign a VNA cluster to the VPC Connection Profile. Select one of the presented Virtual Network Appliance Cluster Models.",
+  "justification": "A VNA cluster is required for stateful network services when using a Distributed TGW with VXLAN integrations.",
+  "implication": "• Additional resources are required for the VNA cluster.\n• Only traffic that is sourced from VPC private or private TGW subnets is forwarded to the VNA cluster to perform stateful services such as NAT.",
+  "subsection": "Distributed VXLAN Connectivity Model for Version 9.1.1 with vSphere Supervisor or VCF-A All Apps Org Design Requirements",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-library/workload-connectivity-designs/distributed-vxlan-connectivity-model-9-1-1.html",
+  "delta": "new"
+ },
+ {
+  "id": "VCF-SEC-RCMD-PPR-001",
+  "decision": "Standardize infrastructure upgrade cycles on the latest available VCF software release.",
+  "justification": "• Running the latest software release proactively closes vulnerability exposure windows before automated exploit chains can proliferate.\n• Fixes might originate from public security advisories or internally identified code improvements.\n• Running older releases (N-1 or older) leaves known vulnerabilities that are exposed to automated scanning engines.",
+  "implication": "Requires shortened qualification cycles, automated testing pipelines, and tight operational alignment with release cadences.",
+  "subsection": "Design Recommendations for People and Process for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/people-and-process.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PPR-002",
+  "decision": "Perform general private cloud platform upgrades within a strict SLA that is measured in weeks.",
+  "justification": "A multi-week operational upgrade window significantly shrinks the window of exposure, minimizing the time threat actors have to scan, identify, and exploit infrastructure vulnerabilities before updates are applied.",
+  "implication": "Demands image-based lifecycle management and pre-authorized maintenance windows across workload domains to avoid application downtime.",
+  "subsection": "Design Recommendations for People and Process for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/people-and-process.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PPR-003",
+  "decision": "Apply patches for VMSAs across the private cloud platform within a strict SLA that is measured in days.",
+  "justification": "Threat actors quickly analyze public VMSA disclosures to create exploit payloads.\nEnforcing a multi-day patching SLA significantly compresses the exposure window and reduces the time VCF components remain vulnerable to targeted exploit attempts.",
+  "implication": "Requires pre-staged patch pipelines, emergency change authorization pathways, and non-disruptive live patching capabilities.",
+  "subsection": "Design Recommendations for People and Process for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/people-and-process.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PPR-004",
+  "decision": "Before deployment in production, complete qualification testing for general software upgrades within an SLA that is measured in days.",
+  "justification": "• Accelerating qualification testing to a multi-day SLA minimizes operational delay between patch availability and deployment.\n• Reduces the duration of exposure during which known vulnerabilities could be exploited.",
+  "implication": "Demands automated synthetic validation test suites and dedicated staging environments to replace manual regression testing bottlenecks.",
+  "subsection": "Design Recommendations for People and Process for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/people-and-process.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PPR-005",
+  "decision": "Before deployment in productin, complete qualification testing for high-severity VMSAs within an emergency SLA that is measured in days.",
+  "justification": "• High-severity VMSAs represent prime targets for rapid exploitation.\n• Establishes an expedited multi-day qualification window.\n• Reduces the time critical vulnerabilities remain unverified for production.\n• Allowing teams to authorize and roll out mitigations before threat actors can exploit the gap.",
+  "implication": "Requires establishing dedicated, expedited qualification pathways specifically for VMSAs, independent of standard feature releases.",
+  "subsection": "Design Recommendations for People and Process for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/people-and-process.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PPR-006",
+  "decision": "Adopt new platform security and operational capabilities upon General Availability (GA).",
+  "justification": "• Adopting new security releases promptly minimizes the duration during which the platform operates under legacy defense baselines.\n• Reduces the time frame during which the infrastructure remains exposed to evolving threat vectors and security capability gaps.",
+  "implication": "Operational teams must maintain continuous competency updates and agile architectural review boards to rapidly evaluate and validate new capabilities.",
+  "subsection": "Design Recommendations for People and Process for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/people-and-process.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PPR-007",
+  "decision": "Standardize private cloud infrastructure on the VCF 9.1.x architecture.",
+  "justification": "• Upgrading to VCF 9.1.x provides native fleet-wide management, automated compliance drift remediation, and integrated security operations\n• Reduces the window of time configuration gaps and legacy management silos remain exposed to potential threats.",
+  "implication": "Might require architectural migration planning, hardware compatibility validation, and operational runbook updates.",
+  "subsection": "Design Recommendations for People and Process for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/people-and-process.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PPR-008",
+  "decision": "Enforce guest operating system and application patch management protocols that can apply security updates within an SLA that are measured in days.",
+  "justification": "• Rapid guest OS and application patching significantly reduces the duration that known vulnerabilities remain accessible\n• Reduces the window of opportunity for an initial workload compromise to be weaponized or escalated across the platform.",
+  "implication": "Requires close operational alignment between infrastructure platform teams and application DevOps teams to automate guest OS patch delivery and testing pipelines.",
+  "subsection": "Design Recommendations for People and Process for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/people-and-process.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PPR-009",
+  "decision": "Establish and maintain a dedicated, permanent internal Rapid Response Team for security incident management.",
+  "justification": "• Maintaining a permanent rapid response team ensures pre-coordinated incident protocols and active threat-hunting capabilities.\n• Reduces time-to-detect and time-to-contain during security incidents.\n• Reduces the duration that an active threat can operate within the environment.",
+  "implication": "Requires dedicated headcount allocation, ongoing threat-hunting duties, and pre-authorized executive authority to execute emergency containment actions across the cloud fabric.",
+  "subsection": "Design Recommendations for People and Process for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/people-and-process.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PPR-010",
+  "decision": "Enforce strict use of predefined protocol tasklists and incident runbooks during security events.",
+  "justification": "• Execution using standardized protocols minimizes decision latency and operational ambiguity during security events.\n• Reduces the total duration that is required to contain active threats and limiting the potential window of disruption.",
+  "implication": "Involves drafting detailed incident runbooks, performing regular dry-run simulation drills, and establishing automated containment triggers.",
+  "subsection": "Design Recommendations for People and Process for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/people-and-process.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PPR-011",
+  "decision": "Align post-incident procedures with established compliance and security governance frameworks, such as ISO, NIST, SOC 2, or NERC.",
+  "justification": "• Standardized post-incident frameworks enforce structured root-cause remediation\n• Reduces the time systemic vulnerabilities or architectural gaps remain in the environment to reduce the duration of exposure to recurring exploit attempts.",
+  "implication": "Demands formal audit logging, rigorous forensic root-cause documentation, and executive and regulatory reporting mechanisms.",
+  "subsection": "Design Recommendations for People and Process for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/people-and-process.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PPR-012",
+  "decision": "Perform regular third-party vulnerability assessments and penetration tests, sharing findings with security leadership and relevant stakeholders.",
+  "justification": "• Independent security assessments and penetration testing validate posture integrity.\n• Minimizes the duration that undetected configuration drift, unpatched attack surface gaps, or legacy exposures remain present in the environment.",
+  "implication": "Requires allocating recurring budget for third-party security services and establishing formal remediation tracking for identified findings.",
+  "subsection": "Design Recommendations for People and Process for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/people-and-process.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-USR-001",
+  "decision": "Aggregate administrative and platform audit logs across the private cloud stack.",
+  "justification": "• Real-time log correlation connects API tokens directly to identity sessions, significantly reducing investigation latency.\n• Minimizes the duration during which unauthorized API activity or compromised sessions remain undetected.",
+  "implication": "Demands central log forwarding configuration with token-level session tracking and encrypted transport.",
+  "subsection": "Design Recommendations for User Security for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-user-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-USR-002",
+  "decision": "Federate administrative identities by using a central identity plane with mandatory MFA and granular, job-specific role-based access control.",
+  "justification": "• Centralized federation with MFA and strict role-based access control reduces reliance on static credentials and restricts privilege boundaries.\n• Minimizes the window of opportunity for credential misuse or unauthorized privilege escalation.",
+  "implication": "Requires integrating VCF Single Sign-On with an enterprise identity provider, such as Okta, or Entra ID, and mapping granular VCF roles.",
+  "subsection": "Design Recommendations for User Security for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-user-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-USR-003",
+  "decision": "Centrally automate and continuously monitor SSL/TLS certificate lifecycles across the fleet using enterprise certificate authority (CA) integration.",
+  "justification": "• Centralized, automated certificate lifecycle management maintains consistent cryptographic baselines.\n• Reduces the duration that expired, misconfigured, or weak certificates create management plane exposure or unexpected outages.",
+  "implication": "Shifts management from manual per-appliance scripts to centralized, automated CA renewal workflows that persist across platform updates.",
+  "subsection": "Design Recommendations for User Security for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-user-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-USR-004",
+  "decision": "Centrally establish, continuously audit, and automatically enforce global password complexity, aging, and account lockout policies across all infrastructure systems.",
+  "justification": "• Centralized fleet-wide password policy enforcement eliminates configuration drift and local credential variations\n• Minimizes the duration that non-compliant or weak authentication baselines remain exposed.",
+  "implication": "Requires establishing automated password complexity, rotation, and lockout profiles across all infrastructure management components.",
+  "subsection": "Design Recommendations for User Security for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-user-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-USR-005",
+  "decision": "Vault and automatically rotate high-privilege operating system, application, and service account credentials using native Privileged Access Management (PAM) integration.",
+  "justification": "• Dynamic PAM vaulting and continuous credential rotation compress the usable lifespan of secrets.\n• Minimizes the duration that harvested or exposed service account credentials can be exploited for lateral movement.",
+  "implication": "Requires integrating high-privilege service accounts, API clients, and OAuth tokens with an enterprise PAM solution.",
+  "subsection": "Design Recommendations for User Security for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-user-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PLT-001",
+  "decision": "Standardize, continuously audit, and strictly enforce TLS 1.3/1.2 protocols and FIPS-validated cryptographic profiles across all management appliances.",
+  "justification": "• Enforcing modern TLS protocols and FIPS-validated cryptographic profiles eliminates legacy cipher support.\n• Minimizes the window of opportunity for traffic interception, decryption, or man-in-the-middle attacks.",
+  "implication": "Requires configuring fleet-wide TLS and FIPS enforcement profiles across all management appliances.",
+  "subsection": "Design Recommendations for Platform Security for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-platform-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PLT-002",
+  "decision": "Automate the deployment, continuous auditing, and remediation of security baselines aligned with VMware Security Configuration Guides (VCF SCG).",
+  "justification": "• Automated compliance drift detection and remediation significantly compress the duration configuration gaps exist\n• Minimizes the timeframe during which VCF infrastructure components remain vulnerable to exploitation.",
+  "implication": "Demands automated benchmark deployment and drift monitoring using central compliance toolchains.",
+  "subsection": "Design Recommendations for Platform Security for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-platform-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PLT-003",
+  "decision": "Require fleet-wide data-in-transit encryption across all live migrations (vMotion), fault tolerance streams, inter-host storage communication and storage replication.",
+  "justification": "• Enforcing mandatory transport encryption neutralizes unencrypted data exposure during live operations.\n• Minimizes the duration active workload RAM and replication streams are susceptible to packet sniffing or memory extraction.",
+  "implication": "Requires setting vMotion encryption to 'Required' globally and enabling host hardware acceleration.",
+  "subsection": "Design Recommendations for Platform Security for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-platform-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PLT-004",
+  "decision": "Mandate AES data-at-rest encryption across all storage datastores, integrated with enterprise Key Management Servers (KMS) and automated Key Encryption Key (KEK) rotation.",
+  "justification": "• Automated KEK rotation that is paired with datastore encryption reduces static cryptographic exposure.\n• Minimizes the time window during which extracted storage snapshots or compromised physical media could expose underlying data.",
+  "implication": "Requires integrating native vSAN / vSphere Encryption with an enterprise Key Management Server (KMS).",
+  "subsection": "Design Recommendations for Platform Security for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-platform-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PLT-005",
+  "decision": "Centralize proactive telemetry, security event correlation, and observability across the SDDC fabric using VCF Operations fleet management.",
+  "justification": "• Unified observability connects multi-layer security telemetry in real time.\n• Reduces mean time to detect (MTTD) and minimizing the duration anomalous cross-stack behavior goes unnoticed.",
+  "implication": "Requires centralizing telemetry and security event correlation across all SDDC management layers.",
+  "subsection": "Design Recommendations for Platform Security for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-platform-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PLT-006",
+  "decision": "Execute platform lifecycle updates and emergency security maintenance using Quick Patch, Reduced Downtime, and rebootless Live Patching capabilities.",
+  "justification": "• Rebootless patching and non-disruptive lifecycle workflows eliminate the operational friction of scheduled downtime.\n• Reduces the exposure window between patch release and active host remediation.",
+  "implication": "• Requires a VCF release that supports Live Patching.\n• Live Patching is not supported in conjunctions with some features.",
+  "subsection": "Design Recommendations for Platform Security for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-platform-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PLT-007",
+  "decision": "Enforce hardware-rooted trust across host infrastructure using UEFI Secure Boot integrated with automated TPM 2.0 remote attestation.",
+  "justification": "• Hardware attestation and Secure Boot protect hypervisor firmware integrity.\n• Minimizes the time 'boot kit' modifications or unauthorized low-level kernel changes can persist without detection.",
+  "implication": "Requires enabling UEFI Secure Boot on host hardware, installing TPM 2.0, and configuring vCenter remote attestation.",
+  "subsection": "Design Recommendations for Platform Security for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-platform-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PLT-008",
+  "decision": "Enforce multi-tenant compute, storage, and network isolation across tenant environments using VPCs and Supervisor Zones.",
+  "justification": "• Structural VPC isolation enforces strict hypervisor and network boundaries.\n• Contains threat blast radius and minimizing the opportunity for a compromised tenant workload to pivot into adjacent tenant spaces.",
+  "implication": "Requires implementing VPCs for VCF Automation and NSX multi-tenancy constructs to enforce strict logical boundaries.",
+  "subsection": "Design Recommendations for Platform Security for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-platform-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PLT-009",
+  "decision": "Automate compute isolation and workload placement policies using vSphere tags, VCF Automation Placement Policies, and tenant resource quotas.",
+  "justification": "• Automated placement policies and quotas ensure that high-security workloads execute on dedicated physical hosts.\n• Minimizes the likelihood and duration of noisy-neighbor resource exhaustion or targeted Denial of Service (DoS) conditions.",
+  "implication": "Demands configuring VCF Automation placement policies, vSphere tags, and explicit organization resource quotas.",
+  "subsection": "Design Recommendations for Platform Security for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-platform-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-PLT-010",
+  "decision": "Automate continuous compliance enforcement and drift remediation using built-in security benchmarks that are paired with fleet-wide CVE visibility.",
+  "justification": "• Continuous benchmark tracking and integrated CVE insights replace periodic auditing cycles.\n• Reduces the duration non-compliant states or unpatched vulnerabilities remain hidden across the fleet.",
+  "implication": "Demands enabling VCF Security Posture Management with automated benchmark mapping and integrated CVE tracking across the fleet.",
+  "subsection": "Design Recommendations for Platform Security for Defending Against Frontier AI Era Exploits",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-platform-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-LAT-001",
+  "decision": "Establish complete East-West traffic observability and flow monitoring across all VCF workload domains.",
+  "justification": "• Deep East-West traffic visibility uncovers hidden lateral movement patterns and unauthorized API probing.\n• Minimizes the duration malicious reconnaissance or intra-VLAN threat propagation can occur undetected.",
+  "implication": "Requires deploying distributed flow monitoring across all virtual switches and workload domains.",
+  "subsection": "Lateral Security for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-lateral-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-LAT-002",
+  "decision": "Enforce zero-trust micro-segmentation policies at the individual workload level (virtual machines, bare-metal hosts, and container pods).",
+  "justification": "• Workload-level ring-fencing restricts lateral connectivity.\n• Reduces the blast radius of a compromised asset\n• Minimizes the time and pathways that an attacker has to move horizontally across internal segments.",
+  "implication": "Requires defining stateful micro-segmentation policies using distributed firewalling directly on host hypervisors.",
+  "subsection": "Lateral Security for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-lateral-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-LAT-003",
+  "decision": "Restrict and enforce stateful security controls on all communication between workloads and shared infrastructure services, such as DNS, NTP, Syslog, and Active Directory.",
+  "justification": "• Enforcing strict default-deny rules between workloads and shared services minimizes the exposure window for Active Directory abuse or service poisoning.\n• Helps prevent compromised workloads from exploiting core infrastructure.",
+  "implication": "Requires creating strict default-deny rules allowing only verified ports and protocols between workloads and core management services.",
+  "subsection": "Lateral Security for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-lateral-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-LAT-004",
+  "decision": "Isolate access to VCF management domains and infrastructure management interfaces by using dedicated micro-segmentation policies.",
+  "justification": "• Micro-segmenting management planes prevents compromised tenant workloads from probing or attacking SDDC infrastructure APIs.\n• Minimizes the risk and duration of management plane exposure.",
+  "implication": "Requires applying distributed firewall rules around management domain hosts, vCenter, and other VCF components.",
+  "subsection": "Lateral Security for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-lateral-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-LAT-005",
+  "decision": "Enforce simultaneous container security controls across both Kubernetes Pod and Node layers.",
+  "justification": "• Dual pod-and-node security limits the blast radius of container breakouts.\n• Minimizes the opportunity and timeframe for an exploited pod to compromise underlying worker nodes or adjacent microservices.",
+  "implication": "Requires integrating CNI-level micro-segmentation for Kubernetes container networks.",
+  "subsection": "Lateral Security for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-lateral-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-LAT-006",
+  "decision": "Aggregate and correlate network and host security alerts in real time using Network Detection & Response (NDR).",
+  "justification": "• Automated real-time event correlation stitches disparate network signals into threat campaigns.\n• Reduces mean time to detect (MTTD) and minimizing alert fatigue for SOC teams.",
+  "implication": "Demands deploying threat correlation engines capable of aggregating network traffic analysis and host alerts.",
+  "subsection": "Lateral Security for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-lateral-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-LAT-007",
+  "decision": "Deploy an Advanced Threat Prevention (ATP) suite—including Distributed IDS/IPS, Network Traffic Analysis (NTA), malware Prevention, and NDR—across all VCF workload clusters.",
+  "justification": "• Full-stack threat inspection detects polymorphic malware and zero-day exploit attempts in real time\n• Minimizes the duration fileless execution or AI-driven command-and-control behavior can operate undetected.",
+  "implication": "Requires activating distributed intrusion prevention, malware inspection, and traffic analysis across all cluster hosts.",
+  "subsection": "Lateral Security for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-lateral-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-LAT-008",
+  "decision": "Enforce and continuously audit regulatory compliance controls (PCI-DSS, HIPAA, FIPS, NERC) across East-West traffic flows.",
+  "justification": "• Continuous compliance enforcement ensures that sensitive data zones maintain audit-ready isolation.\n• Reduces the duration non-compliant security postures or unmonitored traffic paths can persist.",
+  "implication": "Requires mapping compliance benchmarks directly to distributed firewall and threat inspection rules.",
+  "subsection": "Lateral Security for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-lateral-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-LAT-009",
+  "decision": "Automate the creation, monitoring, and optimization of security policies via programmatic pipelines and Infrastructure-as-Code (IaC).",
+  "justification": "• Programmatic policy automation ensures Zero Trust controls are applied instantly as workloads scale.\n• Minimizes manual intervention delays and preventing security policy drift.",
+  "implication": "Requires integrating firewall rule management into IaC pipelines, for example, Terraform or Ansible, and security automation platforms.",
+  "subsection": "Lateral Security for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-lateral-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-LAT-010",
+  "decision": "Continuously review, audit, and optimize firewall rule sets to eliminate redundant, shadow, or stale rules.",
+  "justification": "• Continuous rule optimization prevents policy bloat.\n• Minimizes the timeframe over which overly permissive or obsolete firewall rules remain active in the environment.",
+  "implication": "Requires implementing automated rule analysis tools to identify shadow rules and recommend cleanup.",
+  "subsection": "Lateral Security for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-lateral-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-LAT-011",
+  "decision": "Secure, load balance, and manage containerized application services using enterprise-grade Kubernetes API gateways.",
+  "justification": "• Software-defined ingress gateways deliver elastic traffic routing and TLS termination.\n• Minimizes exposure to container ingress vulnerabilities and traffic overload attacks.",
+  "implication": "Demands deploying software-defined load balancers tightly integrated with Kubernetes cluster control planes.",
+  "subsection": "Lateral Security for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-lateral-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-LAT-012",
+  "decision": "Protect external-facing applications using an active, analytics-driven WAF with zero-day virtual patching.",
+  "justification": "• Active WAF inspection and virtual patching compress the exposure window between the discovery of a vulnerability and the application code fixes.\n• Blocks OWASP Top 10 threats in real time.",
+  "implication": "Requires deploying central WAF policies with positive security models and signature-based threat detection.",
+  "subsection": "Lateral Security for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-lateral-security.html",
+  "delta": ""
+ },
+ {
+  "id": "VCF-SEC-RCMD-LAT-013",
+  "decision": "Automate SSL/TLS certificate lifecycles for applications to meet shortened certificate expiration requirements without manual intervention.",
+  "justification": "• Automated certificate renewal eliminates manual handling bottlenecks.\n• Minimizes the risk and window of application outages that are caused by unexpected certificate expiration.",
+  "implication": "Requires integrating load balancers and ingress gateways directly with enterprise CAs by using automated APIs.",
+  "subsection": "Lateral Security for Securing VCF Against Frontier AI Era Threats",
+  "url": "https://techdocs.broadcom.com/us/en/vmware-cis/vcf/vcf-9-0-and-later/9-1/design/design-blueprints-for/security-modernization/defending-against-frontier-ai-era-exploits/frontier-ai-lateral-security.html",
+  "delta": ""
+ }
+]
